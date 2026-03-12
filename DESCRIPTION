@@ -1,0 +1,19 @@
+Package: zimsSRGa
+Version: 0.0.0.9000
+Title: Survival, Reproduction, and Growth Analytics
+Description: A repeatable way to perform Survival, Reproduction, and Growth analytics from Zims Data.
+Authors@R: c(person(given = "Floriane",
+         family = "Plard",
+         role = c("aut", "cre", "ctr"),
+         email = "floriane.plard@Species360.org"),
+  person(given = "Species",
+         family = "360",
+         role = "cph",
+         email = "Support@Species360.org"),
+  person(given = "Fernando",
+         family = "Colchero",
+         role = "ctb"))
+License: file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3

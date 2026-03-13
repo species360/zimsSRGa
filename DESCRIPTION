@@ -1,19 +1,41 @@
 Package: zimsSRGa
-Version: 0.0.0.9000
 Title: Survival, Reproduction, and Growth Analytics
-Description: A repeatable way to perform Survival, Reproduction, and Growth analytics from Zims Data.
-Authors@R: c(person(given = "Floriane",
-         family = "Plard",
-         role = c("aut", "cre", "ctr"),
-         email = "floriane.plard@Species360.org"),
-  person(given = "Species",
-         family = "360",
-         role = "cph",
-         email = "Support@Species360.org"),
-  person(given = "Fernando",
-         family = "Colchero",
-         role = "ctb"))
+Version: 0.0.0.9000
+Authors@R: c(
+    person("Floriane", "Plard", , "floriane.plard@Species360.org", role = c("aut", "cre", "ctr")),
+    person("Species", "360", , "Support@Species360.org", role = "cph"),
+    person("Fernando", "Colchero", role = "ctb")
+  )
+Description: A repeatable way to perform Survival, Reproduction, and
+    Growth analytics from Zims Data.
 License: file LICENSE
+Imports: 
+    assertthat,
+    BaSTA2.0,
+    checkmate,
+    dplyr,
+    glue,
+    graphics,
+    grDevices,
+    lubridate,
+    magrittr,
+    paramDemo,
+    snowfall,
+    stats,
+    stringr,
+    tibble,
+    tidyr,
+    tidyverse
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat
+VignetteBuilder: 
+    knitr
+Config/fusen/version: 0.7.2
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
+Depends: 
+    R (>= 3.5)
+LazyData: true

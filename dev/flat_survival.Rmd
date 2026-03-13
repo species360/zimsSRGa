@@ -27,7 +27,7 @@ pkgload::load_all(export_all = FALSE)
 * `DataCore` the core data of the species from ZIMS including at least the following columns *AnimalAnonID*, *BirthDate*, *DepartDate*, *EntryDate*, *MaxBirthDate*, *MinBirthDate*, *EntryType*, *DepartType*, *FirstHoldingInstitution*, *LastHoldingInstitution*, *SexType*, and *BirthType*.
 * `DeathInformation` data.frame including at least the following columns *AnimalAnonID* and *RelevantDeathInformationType*
 * `CalculateMetricsFrom` indicates which metrics should be calculated from which data: "Raw", "Kaplan-Meier", "Model".
-* `BirthType`: The birth type to be selected: Captive, Wild, or All
+* `BirthType_sel`: The birth type to be selected: Captive, Wild, or All
 * `PlotDir`: Directory to save the plots of the selected model
 
 It returns a list including, depending on `CalculateMetricsFrom`:
@@ -117,6 +117,7 @@ It returns a list including, depending on `CalculateMetricsFrom`:
 #'     * The second showing remaining life-expectancy, and the age-specific probabilities to live 5 years and 1 year more.
 #'
 #' @export
+#' @import assertthat tidyverse dplyr
 #' 
 #' @examples
 Sur_main <- function(DataCore,   DeathInformation, 
@@ -142,7 +143,7 @@ Sur_main <- function(DataCore,   DeathInformation,
   assert_that(is.data.frame(DeathInformation))
   assert_that(DeathInformation %has_name% c("AnimalAnonID","RelevantDeathInformationType"))
  assert_that(is.character(BirthType_sel), length(BirthType_sel) == 1)
-  assert_that(BirthType %in% c("Captive", "Wild", "All"))
+  assert_that(BirthType_sel %in% c("Captive", "Wild", "All"))
 
   assert_that(is.character(Models))
   assert_that(all(Models %in% c("", "GO", "EX", "LO", "WE")))
@@ -212,7 +213,7 @@ Sur_main <- function(DataCore,   DeathInformation,
   # Select individuals with correct birth type----------------------------------------------------------
   if (BirthType_sel != "All"){
     Data<- DataCore %>%
-      filter(stringr::str_detect(BirthType, pattern = BirthType_sel))
+      dplyr::filter(stringr::str_detect(BirthType, pattern = BirthType_sel))
   }else{Data<- DataCore}
   
   # Run Survival Analysis-------------------------------------------------------------------------------
@@ -264,11 +265,11 @@ test_that("Sur_main works", {
                   Models = "LO", Shape = "bathtub",
                   niter = 1000, burnin = 101, thinning = 10, nchain = 3, ncpus = 3)
   expect_named(out, c("from0"))
-  expect_named(out$from0, c('summary', 'metrics', 'bastaRes', 'DICmods', 'KM_estimator', 'bastatab',  'Sur1', 'Sur5', 'check', 'relex_from0', 'Sur1m'))
+  expect_named(out$from0, c('summary', 'metrics', 'bastaRes', 'DICmods', 'KM_estimator', 'bastatab', 'relex_from0',  'Sur1', 'Sur5', 'Sur1m', 'check'))
   expect_named(out$from0$summary, c('NSelect', 'NUncertdeath', 'NBasta', 'Ndead', 'Nrc', 'N8090', 'N9000', 'N0010', 'N1020', 'N2030', 'QBD10', 'QBD50', 'QBD90', 'BDincert', 'maxAge', 'maxAlive', 'lxMin', 'outLev', 'model', 'analyzed', 'Nerr', 'error'))
   expect_named(out$from0$DICmods, c("Models", "DIC"))
   out <- Sur_main(core, DeathInformation = deathinformation, BirthType_sel = "Captive", 
-                  Models = "LO", Shape = "bathtub", MaxNSur = 10,
+                  Models = "LO", Shape = "bathtub", MaxNSur = 10, MinNSur = 1,
                   niter = 1000, burnin = 101, thinning = 10, nchain = 3, ncpus = 3)
   
 })
@@ -358,6 +359,7 @@ It returns a list including and depending on `CalculateMetricsFrom`:
 #' @export
 #' @importFrom lubridate year
 #' @importFrom BaSTA2.0 basta
+#' @importFrom stats median quantile sd
 #'
 #' @examples
 Sur_ana <- function(Data, DeathInformation, 
@@ -477,7 +479,7 @@ Sur_ana <- function(Data, DeathInformation,
     maxAge = NULL, maxAlive = NULL, 
     lxMin = NULL, outLev = NULL, model ="",
     analyzed = FALSE, Nerr = 0,  error ="")
-  metrics =  tibble(Data = character(0),
+  metrics =  tibble::tibble(Data = character(0),
                     firstage = numeric(0) ,
                     param = character(0),
                     stat =character(0),
@@ -488,7 +490,7 @@ Sur_ana <- function(Data, DeathInformation,
   KMest = NULL
   # Remove individuals with uncertainty in death date----------------------------
   Data <- Data%>%
-    filter((DeathUncertainty < UncertDeath)%>% replace_na(TRUE))
+    dplyr::filter((DeathUncertainty < UncertDeath)%>% tidyr::replace_na(TRUE))
   summar$NUncertdeath =nrow(Data)
   
   # Check for possible gaps in longevity distribution and deduce maximum longevity threshold specifically on the survival dataset
@@ -501,10 +503,10 @@ Sur_ana <- function(Data, DeathInformation,
     summar$lxMin <- 1
     outLev2 = min(OutlLev1, outlLev)
    Datar <- Data%>%
-        mutate(
+        dplyr::mutate(
           deparAge = (DepartDate - BirthDate) / 365.25,
           entryAge = (EntryDate - BirthDate) / 365.25)%>%
-     filter(deparAge>=MinAge)
+     dplyr::filter(deparAge>=MinAge)
    
     while(summar$lxMin > MinLx & outLev2 >= OutlLevmin){
       summar$outLev = outLev2
@@ -512,10 +514,10 @@ Sur_ana <- function(Data, DeathInformation,
         data_sel <-  Datar
       }else{
         data_sel <-  Datar%>%
-          filter(!!sym(paste0("above", summar$outLev))==0)
+          dplyr::filter(!!sym(paste0("above", summar$outLev))==0)
       }
       data_sel <- data_sel%>%
-        filter(deparAge>=MinAge)
+        dplyr::filter(deparAge>=MinAge)
       
       if (!all(data_sel$DepartType == "C")) {
         #Calculate Kaplan-Meier table
@@ -534,7 +536,7 @@ Sur_ana <- function(Data, DeathInformation,
        #from birth
       if ("Raw" %in% CalculateMetricsFrom){
         metrics = rbind(metrics,
-                        tibble(Data = 'Raw',
+                        tibble::tibble(Data = 'Raw',
                                firstage = MinAge,
                                param = c("S1m","S1y", "L50", "MLE", "L90", "L99", "Max_longevity"),
                                stat = c("value"),
@@ -550,10 +552,10 @@ Sur_ana <- function(Data, DeathInformation,
                                )))
         if(length(Datar$BirthDate[Datar$GlobalStatus == "Alive"])>0){
           maxcoh = min(year(Datar$BirthDate[Datar$GlobalStatus == "Alive"]))
-          Datamax = Datar%>%filter(year(BirthDate)<maxcoh)
+          Datamax = Datar%>%dplyr::filter(year(BirthDate)<maxcoh, DepartType == "D")
           if(nrow(Datamax)>0){
             metrics = rbind(metrics,
-                            tibble(Data = 'Raw_Deadcoh',
+                            tibble::tibble(Data = 'Raw_Deadcoh',
                                    firstage = MinAge,
                                    param = c("S1m","S1y","L50", "MLE", "L90", "L99", "Max_longevity", "N"),
                                    stat = c("value"),
@@ -571,7 +573,7 @@ Sur_ana <- function(Data, DeathInformation,
           }
         }
         metrics = rbind(metrics, 
-                        tibble(Data = 'Raw_Longtresh',
+                        tibble::tibble(Data = 'Raw_Longtresh',
                                firstage = MinAge,
                                param = c("S1m","S1y","L50", "MLE", "L90", "L99", "Max_longevity"),
                                stat = c("value"),
@@ -614,7 +616,7 @@ Sur_ana <- function(Data, DeathInformation,
           ma50 = max(which(rawPLE$Z50>=1.96))
         }
         metrics = rbind(metrics,
-                        tibble(Data = 'KM',
+                        tibble::tibble(Data = 'KM',
                                firstage = MinAge,
                                param = c(rep(c("L90", "L50"), each =3),"S1month", "S1year"),
                                stat = c(rep(c("mean", "lower", "upper"), 2),rep('value',2)),
@@ -629,7 +631,7 @@ Sur_ana <- function(Data, DeathInformation,
                                )))
         rawPLE$Ndead = c(0,rawPLE$ple[1:(nrow(rawPLE)-1)] * 1000 -rawPLE$ple[2:nrow(rawPLE)]*1000)
         metrics = rbind(metrics,
-                        tibble(Data = 'KM',
+                        tibble::tibble(Data = 'KM',
                                firstage = MinAge,
                                param = c("MLE", "H", "Epx", "G", "Ex", "CV"),
                                stat =rep("value",6),
@@ -649,28 +651,28 @@ Sur_ana <- function(Data, DeathInformation,
       bastalist <- surv_Bastab(data_sel, DeathInformation = DeathInformation, EarliestDate = MinDate,
                                ExcludeStillBirth = TRUE)
       bastatab <- bastalist%>%
-        mutate(
+        dplyr::mutate(
           bdun = Max.Birth.Date-Min.Birth.Date,
           aliveTime = (Depart.Date - Entry.Date) / 365.25)%>%
-        filter(Depart.Date > Entry.Date)
+        dplyr::filter(Depart.Date > Entry.Date)
       
       if(LastDead){
         bastatab$Depart.Type[bastatab$aliveTime == max(bastatab$aliveTime)]="D"
       }
       #Summary of data used
       summar$NBasta <- nrow(bastatab)
-      summar$Ndead <- nrow(bastatab%>%filter(Depart.Type =="D"))
-      summar$Nrc <- nrow(bastatab%>%filter(Depart.Type =="C"))
-      summar$N8090 <- nrow(bastatab%>%filter(year(Birth.Date) >= 1980 & year(Birth.Date) < 1990 ))
-      summar$N9000 <- nrow(bastatab%>%filter(year(Birth.Date) >= 1990 & year(Birth.Date) < 2000 ))
-      summar$N0010 <- nrow(bastatab%>%filter(year(Birth.Date) >= 2000 & year(Birth.Date) < 2010 ))
-      summar$N1020 <- nrow(bastatab%>%filter(year(Birth.Date) >= 2010 & year(Birth.Date) < 2020 ))
-      summar$N2030 <- nrow(bastatab%>%filter(year(Birth.Date) >= 2020))
+      summar$Ndead <- nrow(bastatab%>%dplyr::filter(Depart.Type =="D"))
+      summar$Nrc <- nrow(bastatab%>%dplyr::filter(Depart.Type =="C"))
+      summar$N8090 <- nrow(bastatab%>%dplyr::filter(year(Birth.Date) >= 1980 & year(Birth.Date) < 1990 ))
+      summar$N9000 <- nrow(bastatab%>%dplyr::filter(year(Birth.Date) >= 1990 & year(Birth.Date) < 2000 ))
+      summar$N0010 <- nrow(bastatab%>%dplyr::filter(year(Birth.Date) >= 2000 & year(Birth.Date) < 2010 ))
+      summar$N1020 <- nrow(bastatab%>%dplyr::filter(year(Birth.Date) >= 2010 & year(Birth.Date) < 2020 ))
+      summar$N2030 <- nrow(bastatab%>%dplyr::filter(year(Birth.Date) >= 2020))
       summar$QBD10 <- quantile(year(bastatab$Birth.Date),0.1)
       summar$QBD50 <- quantile(year(bastatab$Birth.Date),0.5)
       summar$QBD90 <- quantile(year(bastatab$Birth.Date),0.9)
       summar$BDincert<- as.numeric(mean(bastatab$Max.Birth.Date - bastatab$Min.Birth.Date))
-      summar$Ndead <- nrow(bastatab%>%filter(Depart.Type =="D"))
+      summar$Ndead <- nrow(bastatab%>%dplyr::filter(Depart.Type =="D"))
       summar$maxAge <- as.numeric(max(bastatab$Depart.Date - bastatab$Birth.Date, na.rm = TRUE))
       summar$maxAlive <- as.numeric(max(bastatab$Depart.Date - bastatab$Entry.Date, na.rm = TRUE))
       
@@ -688,7 +690,7 @@ Sur_ana <- function(Data, DeathInformation,
               if (summar$NBasta >= MinNSur) {
                 if(summar$NBasta <= MaxNSur){
                   tempList <- list()
-                  DICmods <- tibble(Models = Models,
+                  DICmods <- tibble::tibble(Models = Models,
                                     DIC = 0)
                   #Run the different basta models
                   for (imod in 1:length(Models)) {
@@ -967,7 +969,7 @@ Sur_out <- function(out,
   #Check if model is gompertz report b -----------------------------------------
   if(out$bastaRes$modelSpecs[["model"]] =="GO"){
     out$metrics = rbind(out$metrics,
-                        tibble(Data = 'Model',
+                        tibble::tibble(Data = 'Model',
                                firstage = MinAge,
                                param = "b_Gomp",
                                stat = c("mean", "sd", "lower", "upper"),
@@ -1009,7 +1011,7 @@ Sur_out <- function(out,
   CVx = apply(Lx,1, CalcCVx, x = xv, dx = rep(dx,length(xv)))
   Hx = apply(Lx,1,CalcHx, dx =dx)
   out$metrics = rbind(out$metrics,
-                      tibble(Data = 'Model',
+                      tibble::tibble(Data = 'Model',
                              firstage = MinAge,
                              param = rep(c("MLE", "H", "Epx", "G", "CV", "Hx"),each = 4),
                              stat = rep(c("mean", "sd", "lower", "upper"),6),
@@ -1033,7 +1035,7 @@ Sur_out <- function(out,
   out$Sur1m <- Sur_age(Lx, xv = xv, Nyear = 1/12)
   
   out$metrics = rbind(out$metrics,
-                      tibble(Data = 'Model',
+                      tibble::tibble(Data = 'Model',
                              firstage = MinAge,
                              param = rep(c("remex0", "L50", "L90", "S1month", "S1year"),each =3),
                              stat = rep(c("mean", "lower", "upper"), 5),
@@ -1062,7 +1064,7 @@ Sur_out <- function(out,
   
   #Check if kaplan-meier estimator is within the 95% CI of the estimated Lx from the selected model
   roundN = ifelse(max(out$bastaRes$x+MinAge)>5, 2,3)
-  Lx = tibble(Meann = out$bastaRes$surv$nocov[1,],
+  Lx = tibble::tibble(Meann = out$bastaRes$surv$nocov[1,],
               Lower = out$bastaRes$surv$nocov[2,],
               Upper = out$bastaRes$surv$nocov[3,],
               Ages = round(out$bastaRes$x+round(MinAge,1),roundN))
@@ -1072,12 +1074,12 @@ Sur_out <- function(out,
   Lx$Upper=Lx$Upper/Lx$Upper[1]
   
   LT = out$bastaRes$lifeTable$noCov$ple%>%
-    mutate(Ages = round(Ages/(5*10^(-roundN)))*(5*10^(-roundN)))%>%
+    dplyr::mutate(Ages = round(Ages/(5*10^(-roundN)))*(5*10^(-roundN)))%>%
     group_by(Ages)%>%
     summarise(ple = max(ple))%>%
     left_join(Lx)%>%
     tidyr::drop_na(Lower, Upper)%>%
-    mutate(check = (ple <= Upper & ple >= Lower),
+    dplyr::mutate(check = (ple <= Upper & ple >= Lower),
            residual = Meann - ple,
            sign = ifelse(residual <0, -1,1),
            diff = 0)
@@ -1098,15 +1100,15 @@ Sur_out <- function(out,
   rho = length(which(out$bastatab$Depart.Type == "C"))/nrow(out$bastatab)
   # Add age at death and corresponding age id lines for join with Lx
   temp= out$bastatab%>%
-    mutate(agedeath = (Depart.Date - Birth.Date) / 365.25,
+    dplyr::mutate(agedeath = (Depart.Date - Birth.Date) / 365.25,
            Ages = round(agedeath/(5*10^(-roundN)))*(5*10^(-roundN)),
            Ages = round(Ages,roundN))
   if (max(temp$Ages)>max(Lx$Ages)) {
     temp = temp%>%
-      filter(Ages <= max(Lx$Ages))
+      dplyr::filter(Ages <= max(Lx$Ages))
   }
   temp = temp%>% rowwise()%>%
-    mutate(idage = which(Lx$Ages==Ages))
+    dplyr::mutate(idage = which(Lx$Ages==Ages))
   # Martingale residuals
   D = 0.5*(1-(1+delta)* Lx$Meann[temp$idage])
   D = round(D,roundN)
@@ -1303,7 +1305,7 @@ surv_Bastab <- function (coresubset, DeathInformation,
   # Select columns and join RDI  -----------------------------------------------
   bastadat <- coresubset[, inclcols]%>%
     left_join(DeathInformation%>%select(AnimalAnonID, RelevantDeathInformationType)%>%
-                filter(RelevantDeathInformationType %in% c("Stillborn","Fetal death")), by = "AnimalAnonID")
+                dplyr::filter(RelevantDeathInformationType %in% c("Stillborn","Fetal death")), by = "AnimalAnonID")
   if (all(!is.na(OtherCovars))) {
     colnames(bastadat) <- c("AnimalAnonID", "binSpecies", "Class", 
                             "Order", "Family", "CommonName", "Birth.Date", "Min.Birth.Date", 
@@ -1330,29 +1332,29 @@ surv_Bastab <- function (coresubset, DeathInformation,
   }
   
   bastadat <- bastadat%>%
-    mutate(Depart.Date = lubridate::as_date(Depart.Date),
+    dplyr::mutate(Depart.Date = lubridate::as_date(Depart.Date),
            Entry.Date = lubridate::as_date(Entry.Date),
            Min.Birth.Date = lubridate::as_date(Min.Birth.Date),
            Max.Birth.Date = lubridate::as_date(Max.Birth.Date),
            Birth.Date = lubridate::as_date(Birth.Date)
     )%>%
-    filter(Depart.Date >= EarliestDate,
+    dplyr::filter(Depart.Date >= EarliestDate,
            Entry.Date <= LatestDate)%>%
     tidyr::drop_na(Birth.Date, Min.Birth.Date, Max.Birth.Date, Entry.Date, Depart.Date)%>%
-    filter((Min.Birth.Date <= Birth.Date)%>% replace_na(TRUE), 
+    dplyr::filter((Min.Birth.Date <= Birth.Date)%>% replace_na(TRUE), 
            (Birth.Date <= Max.Birth.Date)%>% replace_na(TRUE), 
            (Birth.Date <= Entry.Date)%>% replace_na(TRUE), 
            (Entry.Date <= Depart.Date)%>% replace_na(TRUE))%>%
-    mutate(Depart.Type = if_else (Depart.Date > LatestDate, "C", Depart.Type),
-           Depart.Date = if_else (Depart.Date > LatestDate, LatestDate, Depart.Date),
-           Entry.Type  = if_else (Entry.Date < EarliestDate, "C", Entry.Type),
-           Entry.Date  = if_else (Entry.Date < EarliestDate, EarliestDate, Entry.Date)
+    dplyr::mutate(Depart.Type =dplyr:: if_else (Depart.Date > LatestDate, "C", Depart.Type),
+           Depart.Date =dplyr:: if_else (Depart.Date > LatestDate, LatestDate, Depart.Date),
+           Entry.Type  =dplyr:: if_else (Entry.Date < EarliestDate, "C", Entry.Type),
+           Entry.Date  =dplyr:: if_else (Entry.Date < EarliestDate, EarliestDate, Entry.Date)
     )
   
   # Remove Stillborn if required ------------------------------------------------
   if(ExcludeStillBirth){
     bastadat <- bastadat%>%
-      filter((Depart.Date != Birth.Date)%>% replace_na(TRUE),
+      dplyr::filter((Depart.Date != Birth.Date)%>% replace_na(TRUE),
              stringr::str_detect(RelevantDeathInformationType, "Stillborn", negate = T)%>% replace_na(TRUE),
              stringr::str_detect(RelevantDeathInformationType, "Fetal death", negate = T)%>% replace_na(TRUE))
   } 
@@ -1380,7 +1382,7 @@ test_that("surv_Bastab works", {
   data(deathinformation)
   out<- surv_Bastab(core, DeathInformation = deathinformation, LatestDate = '2020-12-31', 
                     OtherCovars = c('FirstHoldingInstitution','LastHoldingInstitution'), ExcludeStillBirth = TRUE)
-  expect_named(out, c("AnimalAnonID", "binSpecies", "Class", "Order", "Family", "CommonName", "Birth.Date", "Min.Birth.Date", "Max.Birth.Date", "Entry.Date", "Depart.Date", 'Entry.Type', 'Depart.Type', 'FirstHoldingInstitution', 'LastHoldingInstitution', "RelevantDeathInformationType" ))
+  expect_named(out, c("AnimalAnonID", "binSpecies", "Class", "Order", "Family", "CommonName", "Birth.Date", "Min.Birth.Date", "Max.Birth.Date", "Entry.Date", "Depart.Date", 'Entry.Type', 'Depart.Type', 'FirstHoldingInstitution', 'LastHoldingInstitution'))
   expect_true(max(out$Depart.Date)<=lubridate::as_date('2020-12-31'))
 })
 ```
@@ -1418,7 +1420,7 @@ Sur_ple <- function(Data) {
   # Find records with same first and last age:
   Data <- Data%>%
     rowwise()%>%
-    mutate(idsame = entryAge == deparAge,
+    dplyr::mutate(idsame = entryAge == deparAge,
            deparAge = ifelse(deparAge < 0.1,0.1, deparAge),
            deparAge = round(ifelse(idsame, deparAge + 1/365.25, deparAge),1))%>%
     arrange(deparAge)
@@ -1433,7 +1435,7 @@ Sur_ple <- function(Data) {
   ii = 0
   for (agev in nage) {
     ii = ii + 1
-    idNx <-Data %>%filter(entryAge <= agev,
+    idNx <-Data %>%dplyr::filter(entryAge <= agev,
                           deparAge >= agev)
     delx[ii] <- length(which(Data$DepartType == "D"  & Data$deparAge ==agev))
     Cx[ii] <- 1- delx[ii]/nrow(idNx)
@@ -1599,10 +1601,10 @@ Sur_age <- function(Lx, xv, Nyear = 1) {
   
   exMat <- apply(Lx, 1, Sur_age_0, Nyear = Nyear,xv = xv )
   exMat[is.nan(exMat)]=0
-  exQuants <- tibble(Age = xv[1:nrow(exMat)] , 
+  exQuants <- tibble::tibble(Age = xv[1:nrow(exMat)] , 
                      Lower = apply(exMat, 1, quantile, 0.025),
                      Upper = apply(exMat, 1, quantile, 0.975))%>%
-    mutate(Sur = apply(exMat, 1, mean))
+    dplyr::mutate(Sur = apply(exMat, 1, mean))
   return(exQuants)
 }
 
@@ -1876,6 +1878,274 @@ test_that("KM_Lx works", {
 ```
 
 
+
+# Gap analysis in longevity
+
+`select_Longthreshold()` runs a gap analysis on the distribution of longevity and gives the threshold value to use to avoid having gaps in longevity. It can focus on a given sex using the following arguments:
+
+* `Data` including at least the following columns *Birth.Date*, *Depart.Date*, *Entry.Date*, and *SexType*
+* `SexCats` Male, Female or All
+* `MinN` Minimum number of individuals to run the gap analysis
+* `PlotDir` Directory to save the plots
+* `PlotName` name of the graph to be saved
+
+It returns the data with the selected sex and additional columns showing which individuals are above the percentiles 95%, 99% and 99.9%
+and a summary list including the threshold value selected for the distribution of longevity. It plots the distribution of longevity with gaps if `PlotDir` is given. 
+
+```{r function-select_Longthreshold}
+#' Gap analysis in longevity
+#' 
+#' Run a gap analysis on the distribution of longevity and give the threshold value to use to avoid having gaps in longevity.
+#' 
+#' @param Data \code{data.frame} including at least the following columns *BirthDate* (\code{date}), *DepartDate* (\code{date}), *EntryDate* (\code{date}), and *SexType*
+#' @param SexCats \code{character} Male, Female or All.
+#' @param MinN \code{numeric} Minimum number of individuals to run the gap analysis.
+#' @param PlotDir \code{character} Directory to save the plots.
+#' @param PlotName \code{character} name of the graph to be saved.
+#'
+#' @return A list including
+#' * the data with the selected sex and additional columns showing which individuals are above the percentiles 95%, 99% and 99.9%
+#' * A summary list with:
+#'     * Sex = the sex selected
+#'     * Nselect: the number of individuals of this sex
+#'     * Nlifespan : the number of individuals with estimated lifespan (i.e. estimated birth dates, censored individuals are also included)
+#'     * GapThresh : The threshold value selected for the distribution of longevity
+#'     * NThres : the number of individuals selected using this threshold
+#' * Plot and save the longevity distribution with gaps if PlotDir is given.
+#'  
+#' @export
+#'
+#' @examples
+select_Longthreshold <- function(Data,  SexCats = "All", MinN = 50,
+                                 PlotDir = NULL, PlotName = ''
+                                 ) {
+  # Check correct format for inputs -----------------------------------------------------------------------
+  assert_that(is.data.frame(Data))
+  assert_that(Data  %has_name% c("BirthDate", "DepartDate",
+                                 "EntryDate", "SexType"))
+  assert_that(is.character(SexCats))
+  assert_that(length(SexCats)==1, 
+              msg = "You can chose only one sex category")
+  assert_that(all(SexCats %in% c("Female", "Male", "All")))
+  assert_that(is.numeric(MinN))
+  if(!is.null(PlotDir)){
+    assert_that(is.character(PlotDir))
+    checkmate::assert_directory_exists(PlotDir)}
+  
+    # Initialize Output list_______________________________________________________
+  outTab <- tibble::tibble( 
+    Sex = SexCats,
+    Nselect = 0,
+    Nlifespan = 0,
+    GapThresh = NA, 
+    NThres = 0
+  ) 
+  
+  #Calculate longevity and time alive ------------------------------------------
+  coresubset <- Data%>%
+    dplyr::mutate(
+      #longevities:
+      lifespans = as.numeric(DepartDate - BirthDate) / 365.25,
+      # Calculate time alive:
+      alive = as.numeric(DepartDate - EntryDate) / 365.25)
+  
+
+  # Select Sex -----------------------------------------------------------------
+  if(SexCats %in% c('Male', 'Female')){
+    coresex <- coresubset%>%dplyr::filter(SexType ==SexCats)
+  }else{coresex = coresubset}
+  outTab$Nselect = nrow(coresex)
+  
+  # Run Gap analysis -----------------------------------------------------------
+  if(nrow(coresex)>0){
+     quant = quantile (coresex$lifespans,c(0.95,0.99,0.999))
+    coresex <-  coresex%>%
+      dplyr::mutate(`above95`=dplyr:: if_else(lifespans> quant[1], 1, 0),
+             `above99`=dplyr:: if_else(lifespans> quant[2], 1, 0),
+             `above99.9`=dplyr:: if_else(lifespans> quant[3], 1, 0)
+      )
+    # Find gaps in longevities:
+    corelong <- coresex%>%tidyr::drop_na(lifespans)
+    outTab$Nlifespan <- nrow(corelong)
+     if (nrow(corelong) > MinN) {
+      gapsAlive <- find_gaps(corelong$alive, 
+                             MaxAlive = quantile(corelong$alive, 0.5, na.rm = TRUE), 
+                             plot = F)
+      if (nrow(gapsAlive) > 0) {
+        MaxAlive <-  gapsAlive$iniAge[1]
+      } else {
+        MaxAlive <- max(corelong$alive, na.rm = TRUE)
+      }
+      if (MaxAlive < 5) {
+        MaxAlive <- 5 # nocov
+      } else if (MaxAlive > 50) {
+        MaxAlive <- 50
+      }
+      
+      # Plot the longevity gaps
+      pdf(file = glue::glue("{PlotDir}/{PlotName}_LongThres.pdf"), width = 5, height = 5)
+      par(mar = c(4, 4, 1, 1))
+      gaps <- find_gaps(corelong$lifespans, MaxAlive = MaxAlive, plot = T,
+                        main = PlotName, 
+                        xlab = "")
+      ngap = nrow( gaps)
+      if (nrow(gaps) > 0) {
+        allev <- 0
+        while(allev < 3 & ngap>0) {
+          allev <- allev + 1
+          qlev <- c("99.9", "99", "95")[allev]
+          abcol <- sprintf("above%s", qlev)
+          gaps <- find_gaps(corelong$lifespans[corelong[[abcol]] == 0], 
+                            MaxAlive = MaxAlive, plot = T,
+                            main = paste(qlev, "%"), 
+                            xlab = "")
+          ngap = nrow(gaps)
+        }
+        outTab$GapThresh <-as.numeric(qlev)
+          if (allev < 3) {
+          for (ll in (allev + 1):3) {
+            qlev <- c("99.9", "99", "95")[ll]
+            abcol <- sprintf("above%s", qlev)
+            plot(c(0, 1), c(0, 1), col = NA, axes = FALSE, xlab = "", 
+                 ylab = "", main = paste(qlev, "%"))
+            text(0.5, 0.5, "No gaps", cex = 2)
+            box()
+          }
+        }
+      } else {
+        outTab$GapThresh <-100 # nocov
+      }
+      outTab$NThres <- nrow(coresex)
+      dev.off()
+    } 
+  }
+  return(list(summar = outTab, data = coresex) )
+}
+```
+
+```{r examples-select_Longthreshold}
+TempDir <- paste0(tempdir(check = TRUE),'/temp')
+dir.create(TempDir)
+data(core) #### CHANGE DATASET WITH ONE EXCLUDING ABOVE95 99 99.9
+out <- select_Longthreshold (Data = core,  SexCats = "All", 
+                             PlotDir = TempDir, PlotName = "Testudo_hermanni")
+list.files(TempDir)
+#reMove temporary folder
+unlink(TempDir, recursive = TRUE)
+```
+
+```{r tests-select_Longthreshold}
+test_that("select_Longthreshold works", {
+  TempDir <- paste0(tempdir(check = TRUE),'/temp')
+  dir.create(TempDir)
+  data(core) #### CHANGE DATASET WITH ONE EXCLUDING ABOVE95 99 99.9
+  out <- select_Longthreshold (Data = core,  SexCats = "All", 
+                               PlotDir = TempDir, PlotName = "Testudo_hermanni")
+  expect_true(file.exists(paste(TempDir, 'Testudo_hermanni_LongThres.pdf', sep = '/')))
+  #reMove temporary folder
+  expect_named(out, c("summar",  "data"))
+  expect_true("above95" %in% names(out$data))
+  expect_named(out$summar, c("Sex", 'Nselect', "Nlifespan", "GapThresh", "NThres"))
+  expect_true(out$summar$Sex == "All" )
+  expect_equal(out$summar$Nselect, nrow(core))
+  out <- select_Longthreshold (Data = core[1:30,],  SexCats = "Female", 
+                               PlotDir = TempDir, PlotName = "Testudo_hermanni")
+  unlink(TempDir, recursive = TRUE)
+
+})
+```
+
+
+## Find gaps in a continuous variable
+
+`find_gaps` Looks for gaps within a continuous variable.Values of the variable are rounded and gaps are found if one integer is not represented. Gaps are returned only if the length of the gaps is 20% higher than the starting age of this gap. It uses the following arguments:
+
+* `x` variable to analyze
+* `MaxAlive` Return gaps higher than this maximum, only. Default = NA
+
+It returns a data frame where each line is a gap described by its initial/starting age, its final/ending age and its length
+
+```{r function-find_gaps}
+#' Find gaps in an integer variable
+#' 
+#' Looks for gaps within a continuous variable. Values of the variable are rounded and gaps are found if one integer is not represented. Gaps are returned only if the length of the gaps is 20% higher than the starting age of this gap.
+#'
+#' @param x \code{vector of numeric} variable to analyze
+#' @param MaxAlive \code{numeric} Return gaps higher than this maximum, only.
+#' @param plot \code{logical} whether to actually plot the histogram
+#' @param ... arguments pass to hist()
+#'
+#' @return
+#' A data frame where each line is a gap described by its initial/starting age, its final/ending age and its length
+#' 
+#' @export
+#'
+#' @importFrom graphics abline box hist par text
+#'
+#' @examples
+find_gaps <- function(x,MaxAlive = NA, plot = FALSE,...) {
+   # Check correct format for inputs -----------------------------------------------------------------------
+ assert_that(is.numeric(x))
+  if(is.na(MaxAlive)){
+    MaxAlive = max(x)
+  }else{
+    assert_that(is.numeric(MaxAlive))}
+  assert_that(is.logical(plot))
+  
+  #Round each value of the continuous variable-----------------------------------
+  breaks <- floor(min(x, na.rm = TRUE)):ceiling(max(x, na.rm = TRUE))
+  hs <- hist(x, breaks = breaks, plot = plot, ...)
+  xc <- hs$counts
+  xc[hs$counts > 0] <- 1
+  
+  # Look for gaps ---------------------------------------------------------------
+  fin <- FALSE
+  i <- 1
+  n <- length(xc)
+  gaps <- tibble::tibble(iniAge= numeric(1), finAge= numeric(1), Gap= numeric(1))
+  while(!fin & i < n) {
+    id0st <- which(xc[i:n] == 0)[1]
+    if (!is.na(id0st)) {
+      id0fin <- which(xc[(i + id0st - 1):n] == 1)[1] - 1
+      gaps <- rbind(gaps, c(hs$breaks[i + id0st - 1], 
+                            hs$breaks[i + id0st + id0fin - 2], id0fin))
+      i <- i + id0st + id0fin - 1
+    } else {
+      fin <- TRUE
+    }
+  }
+ 
+  #Return gaps only if the gaps is 20% higher than the starting age of this gap-----
+  idgap <- gaps%>%
+    dplyr::filter(Gap/iniAge > 0.2 ,
+           finAge  >= MaxAlive)
+   if (nrow(idgap) > 0 & plot) {abline(v = idgap$iniAge, col = 2)}
+  return(idgap)
+}
+```
+
+```{r examples-find_gaps}
+x = runif(10,0,40)
+out<-find_gaps(x,MaxAlive = 5, plot = FALSE)
+```
+
+```{r tests-find_gaps}
+test_that("find_gaps works", {
+  x = runif(10,0,40)
+  out<-find_gaps(x,MaxAlive = 5, plot = FALSE)
+  out<-find_gaps(x,MaxAlive = NA, plot = FALSE)
+  expect_named(out,c('iniAge', 'finAge', 'Gap'))
+  expect_equal(out$finAge-out$iniAge+1, out$Gap)
+})
+```
+
+
+
+```{r development-inflate, eval=FALSE}
+# Run but keep eval=FALSE to avoid infinite loop
+# Execute in the console directly
+fusen::inflate(flat_file = "dev/flat_select.Rmd", vignette_name = "Data Selection")
+```
 
 
 

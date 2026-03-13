@@ -17,10 +17,10 @@ fusen::fill_description(
   overwrite = T,
   pkg = here::here(),
   fields = list(
-    Title = "Run ISR analyses for Taxon Profiles",
-    Description = "Survival, Reproduction and Growth analyses",
+    Title = "Survival, Reproduction, and Growth analytics",
+    Description = "A repeatable way to perform Survival, Reproduction, and Growth analytics from Zims Data",
     `Authors@R` = c(
-      person("Floriane", "Plard", email = "floriane.c.plard@gmail.com", role = c("aut", "cre", "ctr")),
+      person("Floriane", "Plard", email = "floriane.plard@Species360.org", role = c("aut", "cre", "ctr")),
       person("Species", "360", email = "Support@Species360.org", role = c("cph")),
       person("Fernando", "Colchero",  role = c("ctb"))
     )
@@ -79,6 +79,15 @@ usethis::use_pipe()
 
 # package-level documentation
 usethis::use_package_doc()
+
+
+#Data
+usethis::use_data(core, overwrite = TRUE)
+usethis::use_data(collection, overwrite = TRUE)
+usethis::use_data(weights, overwrite = TRUE)
+usethis::use_data(deathinformation, overwrite = TRUE)
+usethis::use_data(parent, overwrite = TRUE)
+
 ```
 
 ## Use everytime needed
@@ -99,7 +108,9 @@ attachment::att_amend_desc()
 # Check the package
 devtools::check()
 
-pkgdown::build_site(override = list(destination = "inst/site"))
+*
+  
+  pkgdown::build_site(override = list(destination = "inst/site"))
 pkgdown::build_site()
  # build the tar.gz with vignettes to share with others
 devtools::build(vignettes = TRUE)

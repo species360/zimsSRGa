@@ -38,4 +38,3 @@ flat_survival.Rmd:
     overwrite: ask
     clean: ask
     codecov: false
-keep:

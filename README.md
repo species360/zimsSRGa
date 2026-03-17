@@ -13,15 +13,6 @@ cleaned before using this package.
 
 ## Installation
 
-First you will need install paramDemo on your computer from
-[GitHub](https://github.com/) with:
-
-``` r
-# install.packages("devtools")
-# library(devtools)
-install_git("https://github.com/fercol/paramDemo", subdir = "pkg/")
-```
-
 You can install the development version of zimsSRGa from
 [GitHub](https://github.com/) with:
 
@@ -44,17 +35,9 @@ browseURL(path)
 ## Tutorial for survival
 
 ``` r
-ExtractDate ="2024-08-29"
-Taxa = "Mammalia"
-List_species = list(Mammalia = c("Capra sibirica", "Cuon alpinus", "Nanger granti"))
-
 #Filters -----------------------------------------------------------------------
 # Earliest date to include records
 MinDate <- "1980-01-01"
-# Earliest birth date to include records
-MinBirthDate <- "1900-01-01"
-# Whether to include only Global individuals
-Global = TRUE
 # Birth Type of Animals: "Captive", "Wild" or "All"
 BirthType = "Captive"
 # Minimum number of individuals to run the taxon profile
@@ -63,8 +46,6 @@ MinN <- 50
 MaxOutl <- 99 
 # Minimum number of Institutions that hold individuals from one species
 MinInstitution = 2 
-# Maximum uncertainty accepted for birth dates, in days
-UncertBirth = 365
 # Maximum uncertainty accepted for death dates, in days
 UncertDeath = 365
 # Maximum possible age
@@ -96,55 +77,39 @@ MinBirthKnown = 0.3 #Minimum proportions of known birth dates (within a month)
 MinMLE = 0.1 #Minimum survivorship at Mean life expectancy
 MaxLE = 2     #Maximum remaining life expectancy at max age
 
-# Table with species that require rerruning with higher outlier level:
-MaxOutlev <- read.csv(glue("{AnalysisDir}MaxOutlierLevel.csv"), header = TRUE,
-                      stringsAsFactors = FALSE)
-spOutLev <- MaxOutlev$Specie
-
-
+data(core)
+data(deathinformation)
+out = list()
 # Run survival Analysis---------------------------------------------------------
-## Loop over species
-for (species in List_species[[Taxa]]){
-  print(species)
-  if (species %in% spOutLev) {MaxOutl1 <- 99.9
-  }else{MaxOutl1 <- MaxOutl}
-  Dataspe <- select_species(Species, Animal, Data[[Taxa]]$Collection, UncertBirth = UncertBirth,
-                            BirthType = BirthType,
-                            MinDate = MinDate , ExtractDate = ExtractDate,
-                            Global = Global) 
-  if(nrow(Dataspe$data)>0){
-    out = list()
     ## Loop over sexes
     for (sx in c("Male", "Female")){
       print(sx)
       #Check for gaps in longevity distribution to define a threshold 
       #after which individuals will be deleted (possible outiers or errors in data)
-      sexDat <- select_Longthreshold( Dataspe$data,  SexCats = sx, 
-                                      PlotDir= glue::glue("{PlotDir}/"),
+      sexDat <- select_Longthreshold( core,  SexCats = sx, 
+                                      #PlotDir= glue::glue("{PlotDir}/"),
                                       MinN = MinN ,
-                                      PlotName = glue::glue("{Taxa}_{species}_{sx}") )
+                                      PlotName = glue::glue("plot_{sx}") )
       OutlLev1 = min(sexDat$summar$GapThresh,MaxOutl, na.rm = T)
       
       
       if(nrow(sexDat$data)>0){ 
-        out[[sx]] <-  Sur_main(DataCore = sexDat$data,  DeathInformation =  Data[[Taxa]]$DeathInformation,
-                               BirthType = BirthType, LastDead = T,
-                               PlotDir = glue::glue("{PlotDir}/"),
-                               MaxAge = MaxAge,
+        out[[sx]] <-  Sur_main(DataCore = sexDat$data,  
+                               DeathInformation = deathinformation,
+                               BirthType = BirthType, 
+                               # PlotDir = glue::glue("{PlotDir}/"),
+                               MaxAge = MaxAge, MinAge = MinAge,
                                Models = ModelsSur, Shape= Shape, 
                                OutlLev1 =OutlLev1,
                                MinMLE = MinMLE, MaxLE =  MaxLE,
                                MinDate = MinDate, MinNSur = MinNSur, MaxNSur = MaxNSur, 
                                MinInstitution = MinInstitution,UncertDeath= UncertDeath,
                                MinLx = MinLx , MinBirthKnown = MinBirthKnown, 
-                               niter = niter, burnin = burnin, thinning = thinning, nchain = nchain, 
-                               ncpus = ncpus, PlotName = glue("{Taxa}_{species}_{sx}") )
-        print(out$summary$error)
+                               niter = niter, burnin = burnin, 
+                               thinning = thinning, nchain = nchain, 
+                               ncpus = ncpus, 
+                               # PlotName = glue("plot{sx}") 
+                               )
       }
     }
-  }
-}
-
-#Plot predictions and fit from Basta survival model
-plot(out$bastaRes, plot.type = 'gof')
 ```

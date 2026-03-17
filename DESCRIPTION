@@ -9,6 +9,8 @@ Authors@R: c(
 Description: A repeatable way to perform Survival, Reproduction, and
     Growth analytics from Zims Data.
 License: file LICENSE
+Depends: 
+    R (>= 3.5)
 Imports: 
     assertthat,
     BaSTA2.0,
@@ -28,14 +30,13 @@ Imports:
     tidyverse
 Suggests: 
     knitr,
+    readr,
     rmarkdown,
     testthat
 VignetteBuilder: 
     knitr
 Config/fusen/version: 0.7.2
 Encoding: UTF-8
+LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
-Depends: 
-    R (>= 3.5)
-LazyData: true

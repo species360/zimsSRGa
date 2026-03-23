@@ -13,7 +13,7 @@ Depends:
     R (>= 3.5)
 Imports: 
     assertthat,
-    BaSTA2.0,
+    BaSTA,
     checkmate,
     dplyr,
     glue,

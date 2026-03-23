@@ -16,6 +16,8 @@ knitr::opts_chunk$set(
 # zimsSRGa
 
 <!-- badges: start -->
+[![R-CMD-check](https://github.com/species360/zimsSRGa/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/species360/zimsSRGa/actions/workflows/R-CMD-check.yaml)
+[![Codecov test coverage](https://codecov.io/gh/species360/zimsSRGa/graph/badge.svg)](https://app.codecov.io/gh/species360/zimsSRGa)
 <!-- badges: end -->
 
 
@@ -35,7 +37,7 @@ pak::pak("species360/zimsSRGa")
 
 ## Documentation
 
-Full documentation website on: XXXXXXXXXXXXXX
+Full documentation website on: https://species360.github.io/zimsSRGa
 
 You can also open the documentation locally on your machine using
 ``` r
@@ -43,10 +45,14 @@ path <- system.file("site", "index.html", package = "zimsSRGa")
 browseURL(path)
 ```
 
-## Tutorial for survival
+# Tutorial for survival
 
 
 ```{r, echo = TRUE, eval = FALSE}
+
+library(zimsSRGa)
+
+
 #Filters -----------------------------------------------------------------------
 # Earliest date to include records
 MinDate <- "1980-01-01"

@@ -1,20 +1,27 @@
+---
+output: github_document
+---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+
+
 
 # zimsSRGa
 
 <!-- badges: start -->
-
+[![R-CMD-check](https://github.com/species360/zimsSRGa/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/species360/zimsSRGa/actions/workflows/R-CMD-check.yaml)
+[![Codecov test coverage](https://codecov.io/gh/species360/zimsSRGa/graph/badge.svg)](https://app.codecov.io/gh/species360/zimsSRGa)
 <!-- badges: end -->
 
-zimsSRGa can be used to run the main demographic analyses: survival,
-reproduction and growth analytics from zims data. The data need to be
-cleaned before using this package.
+
+zimsSRGa can be used to run the main demographic analyses: survival, reproduction and growth analytics from zims data.
+The data need to be cleaned before using this package.
+
+
 
 ## Installation
 
-You can install the development version of zimsSRGa from
-[GitHub](https://github.com/) with:
+You can install the development version of zimsSRGa from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("pak")
@@ -23,18 +30,23 @@ pak::pak("species360/zimsSRGa")
 
 ## Documentation
 
-Full documentation website on: XXXXXXXXXXXXXX
+Full documentation website on: https://species360.github.io/zimsSRGa
 
 You can also open the documentation locally on your machine using
-
 ``` r
 path <- system.file("site", "index.html", package = "zimsSRGa")
 browseURL(path)
 ```
 
-## Tutorial for survival
+# Tutorial for survival
+
+
 
 ``` r
+
+library(zimsSRGa)
+
+
 #Filters -----------------------------------------------------------------------
 # Earliest date to include records
 MinDate <- "1980-01-01"
@@ -113,3 +125,6 @@ out = list()
       }
     }
 ```
+
+
+

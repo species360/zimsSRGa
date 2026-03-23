@@ -57,7 +57,7 @@
 #' 
 #' @export
 #' @importFrom lubridate year
-#' @importFrom BaSTA2.0 basta
+#' @importFrom BaSTA basta
 #' @importFrom stats median quantile sd
 #'
 #' @examples
@@ -398,7 +398,7 @@ Sur_ana <- function(Data, DeathInformation,
                   #Run the different basta models
                   for (imod in 1:length(Models)) {
                     print(Models[imod])
-                    tempList[[Models[imod]]] <- BaSTA2.0::basta(
+                    tempList[[Models[imod]]] <- BaSTA::basta(
                       bastatab, dataType = "census", shape = Shape, minAge = MinAge, 
                       model = Models[imod], parallel = TRUE, 
                       ncpus = ncpus, nsim = nchain,
@@ -413,7 +413,7 @@ Sur_ana <- function(Data, DeathInformation,
                     print("more iterations")
                     for (imod in seq_along(Models)) {
                       print(Models[imod])
-                      tempList[[Models[imod]]] <- BaSTA2.0::basta(
+                      tempList[[Models[imod]]] <- BaSTA::basta(
                         bastatab, dataType = "census", shape = Shape, minAge = MinAge, 
                         model = Models[imod], parallel = TRUE,
                         ncpus = ncpus, nsim = nchain, 

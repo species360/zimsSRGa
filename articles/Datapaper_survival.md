@@ -1,0 +1,434 @@
+# Data paper Survival
+
+``` r
+library(zimsSRGa)
+library(zims4science)
+library(tidyverse)
+library(glue)
+```
+
+## Prepare Data
+
+### Filters
+
+``` r
+# List of taxa to analyze -------------------------------------------------------
+TaxaList <- c("Mammalia", "Aves", "Reptilia", "Amphibia", 
+              "Chondrichthyes", "Osteichthyes")
+
+
+#Filters -------------------------------------------------------------------------
+# Earliest date to include records
+MinDate <- "1980-01-01"
+# Earliest birth date to include records
+MinBirthDate <- "1900-01-01"
+#Whether to include only Global individuals
+Global = TRUE
+#Birth Type of Animals: "Captive", "Wild" or "All"
+BirthType = "Captive"
+# Minimum number of individuals to run the taxon profile
+MinN <- 30
+# Maximum threshold in the longevity distribution to use
+MaxOutl <- 99.9
+# Minimum number of Institutions that hold individuals from one species
+MinInstitution = 2 
+# Maximum uncertainty accepted for birth dates, in days
+UncertBirth = 365
+# Maximum uncertainty accepted for death dates, in days
+UncertDeath = 365
+# Maximum uncertainty accepted for measurement dates: weight, in days
+UncertDate = 365
+# Maximum possible age
+MaxAge = 120
+
+
+# Survival Models --------------------------------------------------------------------
+# Survival Models to run: "GO", "LO", "EX" or/and "WE"
+ModelsSur <- c("GO", "LO")
+#Shape of the survival model: "simple", "bathtub" or "Makeham"
+Shape = "bathtub"
+
+# Number of CPUS:
+ncpus <- 4
+
+# MCMC settings:
+niter <- 10000
+burnin <- 3001
+thinning <- 20
+nchain <- 3
+
+# Conditions to run the survival analysis
+MinNSur = 30 #Minimum number of individuals
+MinLx = 0.1  #Minimum survivorship reach by raw life table
+MinBirthKnown = 0.3 #Minimum proportions of known birth date (within a month)
+
+#Checks
+MinMLE = 0.1 #Minimum survivorship at Mean life expectancy
+MaxLE = 2     #Maximum remaining life expectancy at max age
+```
+
+## Analyses from birth
+
+``` r
+#Data
+# SpeciesList = List of species with enough data
+# ExtractDate = "2024-08-29" Date of Zims data extraction date
+
+Species_List = list()
+for (Tax in seq_along(TaxaList)){
+  Taxa = TaxaList[Tax] 
+ 
+  # Load data ------------------------------------------------------------------------
+  Species_List[[Taxa]] = SpeciesList
+  data <- Load_Zimsdata (Taxa = Taxa,
+                         ZIMSDir = ZIMSDirdata, 
+                         Species = Species_List,
+                         Animal = TRUE,
+                         tables = c("Collection", "DeathInformation"),
+                         silent = TRUE) 
+  
+  # Clean Dates -------------------------------------------------------------------
+  core <- Prep_Animal(data[[Taxa]]$Animal, 
+                      ExtractDate = ExtractDate, 
+                      MinBirthDate = MinBirthDate)
+
+  # Loop over species
+  for (isp in seq_along(SpeciesList))]) {
+    # Extract species:
+    species <- SpeciesList[isp]
+    speciesname = stringr::str_replace(species, " ", "_")
+
+    # Prepare data -----------------------------------------------------------------
+    Dat <- select_species(species, Animal = core, 
+                          Collection =data[[Taxa]]$Collection ,  
+                          UncertBirth = UncertBirth, BirthType = BirthType,
+                          MinDate = MinDate , ExtractDate = ExtractDate, 
+                          Global = Global) 
+    repout$general = Dat$summary
+    
+    # Run Analysis for each sex category -------------------------------------------
+    if(nrow(Dat$data)>0){
+      for (sx in  c("Male", "Female", "All")){
+        cat(paste0(" ****************************  ",sx,"  ****************************\n"))
+        dir.create(file.path(PlotDir, "Long_dist"), showWarnings = FALSE)
+        # -------------------------- #
+        # -Check for longevity gaps- #
+        # -------------------------- #
+        sexDat <- select_Longthreshold( Dat$data,  SexCats = sx, 
+                                        PlotDir= glue::glue("{PlotDir}/Long_dist/"),
+                                        MinN = MinN,
+                                        PlotName = glue::glue("{Taxa}_{SpeciesName}_{sx}") )
+        repout$summary[[sx]] = sexDat$summar
+        
+        if(nrow(sexDat$data)>0){
+          outlLev1 = min(sexDat$summar$GapThresh,MaxOutl, na.rm = T)
+          if (outlLev1 ==100){
+            data_sel <-  sexDat$data
+          }else{
+            data_sel <-  sexDat$data%>%
+              filter(!!sym(paste0("above", outlLev1))==0)
+          }
+          
+          
+          if(nrow(data_sel)>0){
+             # -------------------------- #
+            # ---- Survival Analysis: ----
+            # -------------------------- #
+            repout$surv[[sx]][["from0"]] <- Sur_main(DataCore = sexDat$data,  
+                                                      DeathInformation = data[[Taxa]]$DeathInformation,
+                                                      BirthType = BirthType,
+                                                      PlotDir = glue::glue("{PlotDir}/SurvivalAM/"),
+                                                      MaxAge = MaxAge,
+                                                      Models = ModelsSur, Shape = Shape, 
+                                                      MinAge = 0, 
+                                                      OutlLev1 = outlLev1, 
+                                                      MinMLE = MinMLE, MaxLE =  MaxLE,
+                                                      MinDate = MinDate, 
+                                                      MinNSur = MinNSur, 
+                                                      MinInstitution = MinInstitution,
+                                                      UncertDeath = UncertDeath,
+                                                      MinLx = MinLx, MinBirthKnown = MinBirthKnown, 
+                                                      niter = niter, burnin = burnin, thinning = thinning, 
+                                                      nchain = nchain, ncpus = ncpus,
+                                                      PlotName = glue("{Taxa}_{SpeciesName}_{sx}_agemat") )
+           }
+        }
+      }
+    }
+  }
+
+# Save results ------------------------------------------------------------------
+save("repout", file = glue::glue("{AnalysisDir}/Rdata/{Taxa}_{speciesname}.RData"))
+}
+```
+
+## Analyses from age at sexual maturity
+
+``` r
+#Data
+# SpeciesList = List of species with enough data
+# Dat_species = Age at first reproduction pper sex and species
+# ExtractDate = "2024-08-29" Date of Zims data extraction date
+
+Species_List = list()
+for (Tax in seq_along(TaxaList)){
+  Taxa = TaxaList[Tax] 
+ 
+  # Load data ------------------------------------------------------------------------
+  Species_List[[Taxa]] = SpeciesList
+  data <- Load_Zimsdata (Taxa = Taxa,
+                         ZIMSDir = ZIMSDirdata, 
+                         Species = Species_List,
+                         Animal = TRUE,
+                         tables = c("Collection", "DeathInformation"),
+                         silent = TRUE) 
+  
+  # Clean Dates -------------------------------------------------------------------
+  core <- Prep_Animal(data[[Taxa]]$Animal, 
+                      ExtractDate = ExtractDate, 
+                      MinBirthDate = MinBirthDate)
+
+  # Loop over species
+  for (isp in seq_along(SpeciesList))]) {
+    # Extract species:
+    species <- SpeciesList[isp]
+    speciesname = stringr::str_replace(species, " ", "_")
+
+    # Prepare data -----------------------------------------------------------------
+    Dat <- select_species(species, Animal = core, 
+                          Collection =data[[Taxa]]$Collection ,  
+                          UncertBirth = UncertBirth, BirthType = BirthType,
+                          MinDate = MinDate , ExtractDate = ExtractDate, 
+                          Global = Global) 
+    repout$general = Dat$summary
+    
+    # Run Analysis for each sex category -------------------------------------------
+    if(nrow(Dat$data)>0){
+      for (sx in  c("Male", "Female", "All")){
+        cat(paste0(" ****************************  ",sx,"  ****************************\n"))
+        dir.create(file.path(PlotDir, "Long_dist"), showWarnings = FALSE)
+        # -------------------------- #
+        # -Check for longevity gaps- #
+        # -------------------------- #
+        sexDat <- select_Longthreshold( Dat$data,  SexCats = sx, 
+                                        PlotDir= glue::glue("{PlotDir}/Long_dist/"),
+                                        MinN = MinN,
+                                        PlotName = glue::glue("{Taxa}_{SpeciesName}_{sx}") )
+        repout$summary[[sx]] = sexDat$summar
+        
+        if(nrow(sexDat$data)>0){
+          outlLev1 = min(sexDat$summar$GapThresh,MaxOutl, na.rm = T)
+          if (outlLev1 ==100){
+            data_sel <-  sexDat$data
+          }else{
+            data_sel <-  sexDat$data%>%
+              filter(!!sym(paste0("above", outlLev1))==0)
+          }
+          
+          
+          if(nrow(data_sel)>0){
+            #find age at sexual maturity
+            MinAgeAM = round(AMd%>%filter(Sex== sx, Species == species)%>%pull(AM),1)
+            
+            # -------------------------- #
+            # ---- Survival Analysis: ----
+            # -------------------------- #
+            repout$surv[[sx]][["fromAM"]] <- Sur_main(DataCore = sexDat$data,  
+                                                      DeathInformation = data[[Taxa]]$DeathInformation,
+                                                      BirthType = BirthType,
+                                                      PlotDir = glue::glue("{PlotDir}/SurvivalAM/"),
+                                                      MaxAge = MaxAge,
+                                                      Models = ModelsSur, Shape = Shape, 
+                                                      MinAge = MinAgeAM, 
+                                                      OutlLev1 = outlLev1, 
+                                                      MinMLE = MinMLE, MaxLE =  MaxLE,
+                                                      MinDate = MinDate, 
+                                                      MinNSur = MinNSur, 
+                                                      MinInstitution = MinInstitution,
+                                                      UncertDeath = UncertDeath,
+                                                      MinLx = MinLx, MinBirthKnown = MinBirthKnown, 
+                                                      niter = niter, burnin = burnin, thinning = thinning, 
+                                                      nchain = nchain, ncpus = ncpus,
+                                                      PlotName = glue("{Taxa}_{SpeciesName}_{sx}_agemat") )
+           }
+        }
+      }
+    }
+  }
+
+# Save results ------------------------------------------------------------------
+save("repout", file = glue::glue("{AnalysisDir}/RdataAM/{Taxa}_{speciesname}.RData"))
+}
+```
+
+## Simulations
+
+### Create simulated datasets
+
+``` r
+
+# Find species with at least 1500 individuals that were in category A
+Tabspe = Tabspecies%>%
+  filter(Category =="A", Sex =="All")%>%
+  select(Class, Species, Nindiv)%>%
+  filter(Nindiv > 1500)
+
+
+#Sample species
+Tabspesim = rbind(Tabspe%>%filter(Class=="Amphibia"),
+                  Tabspe%>%filter(Class=="Reptilia"),
+                  tabmami[sample(1:nrow(tabmami),50),],
+                  tabav[sample(1:nrow(tabav),50),])
+
+
+#Find age when Px =0 .1 and Px = 0.4
+#Loop over Taxa
+for (t in unique(Tabspesim$Class)){
+  te = 0
+  Datafin=tibble()
+  Species_List = list()
+  Species_List[[t]] =Tabspesim%>%filter(Class==t)%>%pull(Species)
+  
+  #Load Collections  Data
+  data <- Load_Zimsdata (Taxa = t, ZIMSDir = ZIMSDirdata, 
+                         Species = Species_List,
+                         Animal = TRUE,
+                         tables = c("Collection"),
+                         silent = TRUE) 
+  
+  core <- Prep_Animal(data[[t]]$Animal, 
+                      ExtractDate = ExtractDate, 
+                      MinBirthDate = MinBirthDate)
+  
+  
+  for (i in 1:length(Species_List[[t]])){
+    Species =  Species_List[[t]][i]
+    speciesname = stringr::str_replace(Species, " ", "_")
+    
+    #Load Survival analysis results to get Px
+    load(glue::glue("{RdataDir}/{t}_{speciesname}.RData"))
+    KM =  repout$surv[["All"]]$from0$KM_estimator
+    #Find age when PX reach 0.1 and 0.4.
+    age1 = min(KM$Ages[which(KM$Lx<=0.1)])
+    age4 = min(KM$Ages[which(KM$Lx<=0.4)])
+    
+    
+    #Filter data
+    Dat <- select_species(Species, core, data[[t]]$Collection,  
+                          UncertBirth = UncertBirth, BirthType = BirthType,
+                          MinDate = MinDate , ExtractDate = ExtractDate, 
+                          Global = Global)%>%
+      filter((DeathUncertainty < UncertDeath)%>% replace_na(TRUE))
+    
+    # Find date when individuals reach age1 and age4
+    datasel =  Dat$data%>% 
+      mutate(Date4 = BirthDate + dyears(age4),
+             Date1 = BirthDate + dyears(age1))
+    
+    #Go through longevity gaps analysis
+    Dats <- select_Longthreshold(datasel, MinN = MinNSur)
+    outLev2 = min(99.9, Dats$summar$GapThresh)
+    
+    lxmin=0.9
+    while( lxmin> 0.1 & outLev2 >= 95){
+      outLev = outLev2
+        data_sel <-  Dats$data%>%
+          filter(!!sym(paste0("above", outLev))==0)
+    if (!all(data_sel$DepartType == "C")) {
+        #Calculate Kaplan-Meier table
+        rawPLE <- Sur_ple(data_sel)
+        lxMin <- rawPLE$ple[nrow(rawPLE)-1]
+      }
+      if(outLev == 99.9){outLev2 = 99}
+      if(outLev == 99){outLev2 = 95}
+      if(outLev == 95){outLev2 = 90}
+    }
+    
+    # Change Depart Dates
+    data1 = data_sel%>%
+      mutate(
+        deparAge = (DepartDate - BirthDate) / 365.25,
+        entryAge = (EntryDate - BirthDate) / 365.25
+      )%>%
+      mutate(DepartType = ifelse(DepartDate>Date1,"C",DepartType),
+             changer= ifelse(DepartDate>Date1,1,0))
+    data1$DepartDate[data1$DepartDate> data1$Date1]=as_date(data1$Date1)[data1$DepartDate> data1$Date1]
+    
+    data4 = data_sel%>%
+      mutate(DepartType = ifelse(DepartDate>Date4,"C",DepartType),
+             changer= ifelse(DepartDate>Date4,1,0))
+    data4$DepartDate[data4$DepartDate> data4$Date4]=as_date(data4$Date4)[data4$DepartDate> data4$Date4]
+    
+    # Sample datasets
+    for (s in c(1:5)){
+      for (N in c(50,200,500,1000)){
+        if(nrow(data1)>=N){
+          te = te+1
+          data1N = data1[sample(1:nrow(data1),N),]%>%
+            mutate(Nechan = N,
+                   Pxsim = 0.1,
+                   test = te)
+        }else{data1N = tibble()}
+        if(nrow(data4)>=N){
+          te=te+1
+          data4N = data4[sample(1:nrow(data4),N),]%>%
+            mutate(Nechan = N,
+                   Pxsim = 0.4,
+                   test = te)
+        }else{data4N = tibble()}
+        Datafin = rbind(Datafin,data1N,data4N)
+      }
+    }
+  }
+  write_csv2(Datafin,glue("{AnalysisDir}Datafin_simu_{t}.csv"))
+}
+```
+
+### Run analysis
+
+Species_simu.csv
+
+``` r
+Species_List=list()
+
+
+for (Taxa in TaxaList[1:4]){
+  
+  #Load Data & Death information data
+  Datasim = readr::read_csv2(glue("{AnalysisDir}Datafin_simu_{Taxa}.csv"))
+  
+  Species_List[[Taxa]] = unique(Datasim$SpeciesName)
+  datt <- Load_Zimsdata (Taxa , ZIMSDir = ZIMSDirdata, 
+                         Species = Species_List,
+                         Animal = FALSE,
+                         tables = "DeathInformation",
+                         silent = TRUE)
+ 
+  # Loop over simulated dataset 
+  for (t in 1:length(Datasim$test)){
+    datas = Datasim%>%filter(test == t)
+    SpeciesName = stringr::str_replace(unique(datas$SpeciesName), " ", "_")
+    
+    #Run survival analysis on simulated dataset
+    out <- Sur_main(DataCore = datas,
+                    DeathInformation = datt[[Taxa]]$DeathInformation,
+                    BirthType = BirthType,
+                    PlotDir = glue ("/work/Species360/Demo_Analyses/Plot/Simu/"),
+                    MaxAge = MaxAge,
+                    Models = ModelsSur, Shape = Shape,
+                    MinAge = 0,
+                    OutlLev1 = 99.9,
+                    MinMLE = MinMLE, MaxLE =  MaxLE,
+                     MinDate = MinDate, MinNSur = MinNSur,
+                    MinInstitution = MinInstitution,
+                    UncertDeath = UncertDeath,
+                    MinLx = MinLx, MinBirthKnown = MinBirthKnown,
+                    niter = niter, burnin = burnin, thinning = thinning,
+                    nchain = nchain, ncpus = ncpus,
+                    PlotName = glue("{Taxa}_{SpeciesName}_{t}_simu") )
+    
+    out[["simu"]]=list(Class = Taxa, Species = unique(datas$SpeciesName), Nechan = unique(datas$Nechan), Px = unique(datas$Pxsim))
+    save(out, file = glue::glue("/work/Species360/Demo_Analyses/Simu/Simu_{Taxa}_{t}.RData"))
+  }
+}
+```

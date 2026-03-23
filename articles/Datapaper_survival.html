@@ -91,7 +91,7 @@
 <span><span class="va">Global</span> <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="co">#Birth Type of Animals: "Captive", "Wild" or "All"</span></span>
 <span><span class="va">BirthType</span> <span class="op">=</span> <span class="st">"Captive"</span></span>
-<span><span class="co"># Minimum number of individuals to run the taxon profile</span></span>
+<span><span class="co"># Minimum global number of individuals</span></span>
 <span><span class="va">MinN</span> <span class="op">&lt;-</span> <span class="fl">30</span></span>
 <span><span class="co"># Maximum threshold in the longevity distribution to use</span></span>
 <span><span class="va">MaxOutl</span> <span class="op">&lt;-</span> <span class="fl">99.9</span></span>
@@ -101,8 +101,6 @@
 <span><span class="va">UncertBirth</span> <span class="op">=</span> <span class="fl">365</span></span>
 <span><span class="co"># Maximum uncertainty accepted for death dates, in days</span></span>
 <span><span class="va">UncertDeath</span> <span class="op">=</span> <span class="fl">365</span></span>
-<span><span class="co"># Maximum uncertainty accepted for measurement dates: weight, in days</span></span>
-<span><span class="va">UncertDate</span> <span class="op">=</span> <span class="fl">365</span></span>
 <span><span class="co"># Maximum possible age</span></span>
 <span><span class="va">MaxAge</span> <span class="op">=</span> <span class="fl">120</span></span>
 <span></span>
@@ -124,8 +122,8 @@
 <span></span>
 <span><span class="co"># Conditions to run the survival analysis</span></span>
 <span><span class="va">MinNSur</span> <span class="op">=</span> <span class="fl">30</span> <span class="co">#Minimum number of individuals</span></span>
-<span><span class="va">MinLx</span> <span class="op">=</span> <span class="fl">0.1</span>  <span class="co">#Minimum survivorship reach by raw life table</span></span>
-<span><span class="va">MinBirthKnown</span> <span class="op">=</span> <span class="fl">0.3</span> <span class="co">#Minimum proportions of known birth date (within a month)</span></span>
+<span><span class="va">MinLx</span> <span class="op">=</span> <span class="fl">0.1</span>  <span class="co">#Minimum survivorship reach by Kaplan-Meier table</span></span>
+<span><span class="va">MinBirthKnown</span> <span class="op">=</span> <span class="fl">0.3</span> <span class="co">#Minimum proportion of known birth date (within a month)</span></span>
 <span></span>
 <span><span class="co">#Checks</span></span>
 <span><span class="va">MinMLE</span> <span class="op">=</span> <span class="fl">0.1</span> <span class="co">#Minimum survivorship at Mean life expectancy</span></span>
@@ -233,7 +231,7 @@
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a></span>
 <span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="co">#Data</span></span>
 <span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="co"># SpeciesList = List of species with enough data</span></span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co"># Dat_species = Age at first reproduction pper sex and species</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co"># Dat_species = Age at first reproduction per sex and species</span></span>
 <span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co"># ExtractDate = "2024-08-29" Date of Zims data extraction date</span></span>
 <span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a></span>
 <span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>Species_List <span class="ot">=</span> <span class="fu">list</span>()</span>
@@ -333,7 +331,9 @@
 <h3 id="create-simulated-datasets">Create simulated datasets<a class="anchor" aria-label="anchor" href="#create-simulated-datasets"></a>
 </h3>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<code class="sourceCode R"><span><span class="co">#Data</span></span>
+<span><span class="co"># Tabspecies = Table of Species, number of individuals and result category</span></span>
+<span></span>
 <span><span class="co"># Find species with at least 1500 individuals that were in category A</span></span>
 <span><span class="va">Tabspe</span> <span class="op">=</span> <span class="va">Tabspecies</span><span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Category</span> <span class="op">==</span><span class="st">"A"</span>, <span class="va">Sex</span> <span class="op">==</span><span class="st">"All"</span><span class="op">)</span><span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
@@ -348,7 +348,7 @@
 <span>                  <span class="va">tabav</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">tabav</span><span class="op">)</span>,<span class="fl">50</span><span class="op">)</span>,<span class="op">]</span><span class="op">)</span></span>
 <span></span>
 <span></span>
-<span><span class="co">#Find age when Px =0 .1 and Px = 0.4</span></span>
+<span><span class="co">#Find ages when Px = 0.1 and Px = 0.4</span></span>
 <span><span class="co">#Loop over Taxa</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">t</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">Tabspesim</span><span class="op">$</span><span class="va">Class</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
 <span>  <span class="va">te</span> <span class="op">=</span> <span class="fl">0</span></span>
@@ -453,7 +453,6 @@
 <div class="section level3">
 <h3 id="run-analysis">Run analysis<a class="anchor" aria-label="anchor" href="#run-analysis"></a>
 </h3>
-<p>Species_simu.csv</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Species_List</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>

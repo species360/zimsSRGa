@@ -26,7 +26,7 @@ MinBirthDate <- "1900-01-01"
 Global = TRUE
 #Birth Type of Animals: "Captive", "Wild" or "All"
 BirthType = "Captive"
-# Minimum number of individuals to run the taxon profile
+# Minimum global number of individuals
 MinN <- 30
 # Maximum threshold in the longevity distribution to use
 MaxOutl <- 99.9
@@ -36,8 +36,6 @@ MinInstitution = 2
 UncertBirth = 365
 # Maximum uncertainty accepted for death dates, in days
 UncertDeath = 365
-# Maximum uncertainty accepted for measurement dates: weight, in days
-UncertDate = 365
 # Maximum possible age
 MaxAge = 120
 
@@ -59,8 +57,8 @@ nchain <- 3
 
 # Conditions to run the survival analysis
 MinNSur = 30 #Minimum number of individuals
-MinLx = 0.1  #Minimum survivorship reach by raw life table
-MinBirthKnown = 0.3 #Minimum proportions of known birth date (within a month)
+MinLx = 0.1  #Minimum survivorship reach by Kaplan-Meier table
+MinBirthKnown = 0.3 #Minimum proportion of known birth date (within a month)
 
 #Checks
 MinMLE = 0.1 #Minimum survivorship at Mean life expectancy
@@ -167,7 +165,7 @@ save("repout", file = glue::glue("{AnalysisDir}/Rdata/{Taxa}_{speciesname}.RData
 ``` r
 #Data
 # SpeciesList = List of species with enough data
-# Dat_species = Age at first reproduction pper sex and species
+# Dat_species = Age at first reproduction per sex and species
 # ExtractDate = "2024-08-29" Date of Zims data extraction date
 
 Species_List = list()
@@ -266,6 +264,8 @@ save("repout", file = glue::glue("{AnalysisDir}/RdataAM/{Taxa}_{speciesname}.RDa
 ### Create simulated datasets
 
 ``` r
+#Data
+# Tabspecies = Table of Species, number of individuals and result category
 
 # Find species with at least 1500 individuals that were in category A
 Tabspe = Tabspecies%>%
@@ -281,7 +281,7 @@ Tabspesim = rbind(Tabspe%>%filter(Class=="Amphibia"),
                   tabav[sample(1:nrow(tabav),50),])
 
 
-#Find age when Px =0 .1 and Px = 0.4
+#Find ages when Px = 0.1 and Px = 0.4
 #Loop over Taxa
 for (t in unique(Tabspesim$Class)){
   te = 0
@@ -385,8 +385,6 @@ for (t in unique(Tabspesim$Class)){
 ```
 
 ### Run analysis
-
-Species_simu.csv
 
 ``` r
 Species_List=list()

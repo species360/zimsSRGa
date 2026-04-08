@@ -39,26 +39,19 @@ pak::pak("species360/zimsSRGa")
 
 Full documentation website on: https://species360.github.io/zimsSRGa
 
-You can also open the documentation locally on your machine using
-``` r
-path <- system.file("site", "index.html", package = "zimsSRGa")
-browseURL(path)
-```
 
 # Tutorial for survival
 
 
 ```{r, echo = TRUE, eval = FALSE}
-
 library(zimsSRGa)
-
 
 #Filters -----------------------------------------------------------------------
 # Earliest date to include records
 MinDate <- "1980-01-01"
 # Birth Type of Animals: "Captive", "Wild" or "All"
 BirthType = "Captive"
-# Minimum number of individuals to run the taxon profile
+# Minimum number of individuals to run the Survival Analysis
 MinN <- 50
 # Maximum threshold in the longevity distribution to use
 MaxOutl <- 99 

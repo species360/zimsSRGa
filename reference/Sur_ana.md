@@ -225,7 +225,7 @@ out <- Sur_ana(core,  DeathInformation = deathinformation, Models = "GO", Shape 
 #> [1] "GO"
 #> 
 #> Running sequence to find jump SDs... Done
-#> Total jump SDs computing time: 9.92 secs.
+#> Total jump SDs computing time: 10.00 secs.
 #> 
 #> Multiple simulations started...
 #> 
@@ -238,7 +238,7 @@ out <- Sur_ana(core,  DeathInformation = deathinformation, Models = "GO", Shape 
 #> 
 #> Stopping cluster
 #> Simulations finished.
-#> Total MCMC computing time: 6.44 secs.
+#> Total MCMC computing time: 6.22 secs.
 #> 
 #> Calculating summary statistics... Done.
 #> All parameters converged properly.

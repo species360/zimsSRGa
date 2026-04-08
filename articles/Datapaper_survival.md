@@ -24,7 +24,7 @@ MinDate <- "1980-01-01"
 MinBirthDate <- "1900-01-01"
 #Whether to include only Global individuals
 Global = TRUE
-#Birth Type of Animals: "Captive", "Wild" or "All"
+#Birth Type of Animals: 
 BirthType = "Captive"
 # Minimum global number of individuals
 MinN <- 30
@@ -41,9 +41,9 @@ MaxAge = 120
 
 
 # Survival Models --------------------------------------------------------------------
-# Survival Models to run: "GO", "LO", "EX" or/and "WE"
+# Survival Models to run:
 ModelsSur <- c("GO", "LO")
-#Shape of the survival model: "simple", "bathtub" or "Makeham"
+#Shape of the survival model: 
 Shape = "bathtub"
 
 # Number of CPUS:

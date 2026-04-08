@@ -289,7 +289,7 @@ out <- Sur_main(core, DeathInformation = deathinformation, BirthType_sel = "All"
 #> [1] "GO"
 #> 
 #> Running sequence to find jump SDs... Done
-#> Total jump SDs computing time: 9.95 secs.
+#> Total jump SDs computing time: 9.84 secs.
 #> 
 #> Multiple simulations started...
 #> 
@@ -300,7 +300,7 @@ out <- Sur_main(core, DeathInformation = deathinformation, BirthType_sel = "All"
 #> 
 #> Stopping cluster
 #> Simulations finished.
-#> Total MCMC computing time: 6.27 secs.
+#> Total MCMC computing time: 6.15 secs.
 #> 
 #> Calculating summary statistics... Done.
 #> All parameters converged properly.

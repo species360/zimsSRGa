@@ -70,26 +70,20 @@
 <h2 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a>
 </h2>
 <p>Full documentation website on: <a href="https://species360.github.io/zimsSRGa" class="external-link uri">https://species360.github.io/zimsSRGa</a></p>
-<p>You can also open the documentation locally on your machine using</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"site"</span>, <span class="st">"index.html"</span>, package <span class="op">=</span> <span class="st">"zimsSRGa"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/browseURL.html" class="external-link">browseURL</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level1">
 <h1 id="tutorial-for-survival">Tutorial for survival<a class="anchor" aria-label="anchor" href="#tutorial-for-survival"></a>
 </h1>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">zimsSRGa</span><span class="op">)</span></span>
-<span></span>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">zimsSRGa</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">#Filters -----------------------------------------------------------------------</span></span>
 <span><span class="co"># Earliest date to include records</span></span>
 <span><span class="va">MinDate</span> <span class="op">&lt;-</span> <span class="st">"1980-01-01"</span></span>
 <span><span class="co"># Birth Type of Animals: "Captive", "Wild" or "All"</span></span>
 <span><span class="va">BirthType</span> <span class="op">=</span> <span class="st">"Captive"</span></span>
-<span><span class="co"># Minimum number of individuals to run the taxon profile</span></span>
+<span><span class="co"># Minimum number of individuals to run the Survival Analysis</span></span>
 <span><span class="va">MinN</span> <span class="op">&lt;-</span> <span class="fl">50</span></span>
 <span><span class="co"># Maximum threshold in the longevity distribution to use</span></span>
 <span><span class="va">MaxOutl</span> <span class="op">&lt;-</span> <span class="fl">99</span> </span>

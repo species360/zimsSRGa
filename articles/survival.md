@@ -40,7 +40,7 @@ out <- Sur_main(core, DeathInformation = deathinformation, BirthType_sel = "All"
 #> [1] "GO"
 #> 
 #> Running sequence to find jump SDs... Done
-#> Total jump SDs computing time: 10.43 secs.
+#> Total jump SDs computing time: 10.14 secs.
 #> 
 #> Multiple simulations started...
 #> 
@@ -51,7 +51,7 @@ out <- Sur_main(core, DeathInformation = deathinformation, BirthType_sel = "All"
 #> 
 #> Stopping cluster
 #> Simulations finished.
-#> Total MCMC computing time: 6.48 secs.
+#> Total MCMC computing time: 6.35 secs.
 #> 
 #> Calculating summary statistics... Done.
 #> All parameters converged properly.
@@ -105,7 +105,7 @@ out <- Sur_ana(core,  DeathInformation = deathinformation, Models = "GO", Shape 
 #> [1] "GO"
 #> 
 #> Running sequence to find jump SDs... Done
-#> Total jump SDs computing time: 10.26 secs.
+#> Total jump SDs computing time: 9.90 secs.
 #> 
 #> Multiple simulations started...
 #> snowfall 1.84-6.3 initialized (using snow 0.4-4): parallel execution on 3 CPUs.
@@ -114,7 +114,7 @@ out <- Sur_ana(core,  DeathInformation = deathinformation, Models = "GO", Shape 
 #> 
 #> Stopping cluster
 #> Simulations finished.
-#> Total MCMC computing time: 6.45 secs.
+#> Total MCMC computing time: 6.29 secs.
 #> 
 #> Calculating summary statistics... Done.
 #> All parameters converged properly.
@@ -147,7 +147,7 @@ out <- Sur_ana(core,  DeathInformation = deathinformation,
 #> [1] "GO"
 #> 
 #> Running sequence to find jump SDs... Done
-#> Total jump SDs computing time: 10.14 secs.
+#> Total jump SDs computing time: 10.01 secs.
 #> 
 #> Multiple simulations started...
 #> snowfall 1.84-6.3 initialized (using snow 0.4-4): parallel execution on 3 CPUs.
@@ -156,7 +156,7 @@ out <- Sur_ana(core,  DeathInformation = deathinformation,
 #> 
 #> Stopping cluster
 #> Simulations finished.
-#> Total MCMC computing time: 6.56 secs.
+#> Total MCMC computing time: 6.22 secs.
 #> 
 #> Calculating summary statistics... Done.
 #> All parameters converged properly.

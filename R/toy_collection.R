@@ -11,7 +11,7 @@
 #' \item{ChangeDate}{Date of arrival in this collection}
 #' #' }
 #'
-#' @usage data(collection)
+#' @usage data(toy_collection)
 #'
 #' @source Subset of a toy database created by the Species360 Development team in 08-2024
-"collection"
+"toy_collection"

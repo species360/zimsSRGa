@@ -146,9 +146,9 @@ A named list with one element per value of \code{MinAge}, named
 Run the survival analysis and calculates key survival metrics
 }
 \examples{
-data(core)
-data(deathinformation)
-out <- Sur_main(core, DeathInformation = deathinformation, BirthType_sel = "All",
+data(toy_core)
+data(toy_deathinformation)
+out <- Sur_main(toy_core, DeathInformation = toy_deathinformation, BirthType_sel = "All",
                 Models = "GO", Shape = "simple",
                 niter = 1000, burnin = 101, thinning = 10, nchain = 3, ncpus = 3)
 }

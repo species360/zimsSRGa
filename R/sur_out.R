@@ -46,9 +46,9 @@
 #' @importFrom graphics lines
 #'
 #' @examples
-#' data(core)
-#' data(deathinformation)
-#' out <- Sur_ana(core,  DeathInformation = deathinformation, 
+#' data(toy_core)
+#' data(toy_deathinformation)
+#' out <- Sur_ana(toy_core,  DeathInformation = toy_deathinformation, 
 #'                Models = "GO", Shape = "simple",
 #'                niter = 1000, burnin = 101, thinning = 10, nchain = 3, ncpus = 3)
 #'

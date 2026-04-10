@@ -44,8 +44,8 @@ Run a gap analysis on the distribution of longevity and give the threshold value
 \examples{
 TempDir <- paste0(tempdir(check = TRUE),'/temp')
 dir.create(TempDir)
-data(core) #### CHANGE DATASET WITH ONE EXCLUDING ABOVE95 99 99.9
-out <- select_Longthreshold (Data = core,  SexCats = "All", 
+data(toy_core) #### CHANGE DATASET WITH ONE EXCLUDING ABOVE95 99 99.9
+out <- select_Longthreshold (Data = toy_core,  SexCats = "All", 
                              PlotDir = TempDir, PlotName = "Testudo_hermanni")
 list.files(TempDir)
 #reMove temporary folder

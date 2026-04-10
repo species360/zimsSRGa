@@ -88,8 +88,8 @@ MinBirthKnown = 0.3 #Minimum proportions of known birth dates (within a month)
 MinMLE = 0.1 #Minimum survivorship at Mean life expectancy
 MaxLE = 2     #Maximum remaining life expectancy at max age
 
-data(core)
-data(deathinformation)
+data(toy_core)
+data(toy_deathinformation)
 out = list()
 # Run survival Analysis---------------------------------------------------------
     ## Loop over sexes

@@ -40,7 +40,7 @@
 #' \item{above99.9}{1 = the individual is within the oldest 0.1% of the distribution of individual lifespans}
 #' #' }
 #'
-#' @usage data(core)
+#' @usage data(toy_core)
 #'
 #' @source Subset of a toy database created by the Species360 Development team in 08-2024
-"core"
+"toy_core"

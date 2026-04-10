@@ -61,9 +61,9 @@
 #' @importFrom stats median quantile sd
 #'
 #' @examples
-#' data(core)
-#' data(deathinformation)
-#' out <- Sur_ana(core,  DeathInformation = deathinformation, Models = "GO", Shape = "simple",
+#' data(toy_core)
+#' data(toy_deathinformation)
+#' out <- Sur_ana(toy_core,  DeathInformation = toy_deathinformation, Models = "GO", Shape = "simple",
 #'                niter = 1000, burnin = 101, thinning = 10, nchain = 3, ncpus = 3)
 Sur_ana <- function(Data, DeathInformation, 
                     CalculateMetricsFrom = c("Raw", "Kaplan-Meier", "Model"), 

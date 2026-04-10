@@ -82,11 +82,11 @@ usethis::use_package_doc()
 
 
 #Data
-usethis::use_data(core, overwrite = TRUE)
-usethis::use_data(collection, overwrite = TRUE)
-usethis::use_data(weights, overwrite = TRUE)
-usethis::use_data(deathinformation, overwrite = TRUE)
-usethis::use_data(parent, overwrite = TRUE)
+usethis::use_data(toy_core, overwrite = TRUE)
+usethis::use_data(toy_collection, overwrite = TRUE)
+usethis::use_data(toy_weights, overwrite = TRUE)
+usethis::use_data(toy_deathinformation, overwrite = TRUE)
+usethis::use_data(toy_parent, overwrite = TRUE)
 
 ```
 

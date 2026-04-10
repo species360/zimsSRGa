@@ -250,25 +250,25 @@ Sur_main <- function(DataCore,   DeathInformation,
 ```
 
 ```{r examples-Sur_main}
-data(core)
-data(deathinformation)
-out <- Sur_main(core, DeathInformation = deathinformation, BirthType_sel = "All",
+data(toy_core)
+data(toy_deathinformation)
+out <- Sur_main(toy_core, DeathInformation = toy_deathinformation, BirthType_sel = "All",
                 Models = "GO", Shape = "simple",
                 niter = 1000, burnin = 101, thinning = 10, nchain = 3, ncpus = 3)
 ```
 
 ```{r tests-Sur_main}
 test_that("Sur_main works", {
-  data(core)
-  data(deathinformation)
-  out <- Sur_main(core, DeathInformation = deathinformation, BirthType_sel = "Captive", 
+  data(toy_core)
+  data(toy_deathinformation)
+  out <- Sur_main(toy_core, DeathInformation = toy_deathinformation, BirthType_sel = "Captive", 
                   Models = "LO", Shape = "bathtub",
                   niter = 1000, burnin = 101, thinning = 10, nchain = 3, ncpus = 3)
   expect_named(out, c("from0"))
   expect_named(out$from0, c('summary', 'metrics', 'bastaRes', 'DICmods', 'KM_estimator', 'bastatab', 'relex_from0',  'Sur1', 'Sur5', 'Sur1m', 'check'))
   expect_named(out$from0$summary, c('NSelect', 'NUncertdeath', 'NBasta', 'Ndead', 'Nrc', 'N8090', 'N9000', 'N0010', 'N1020', 'N2030', 'QBD10', 'QBD50', 'QBD90', 'BDincert', 'maxAge', 'maxAlive', 'lxMin', 'outLev', 'model', 'analyzed', 'Nerr', 'error'))
   expect_named(out$from0$DICmods, c("Models", "DIC"))
-  out <- Sur_main(core, DeathInformation = deathinformation, BirthType_sel = "Captive", 
+  out <- Sur_main(toy_core, DeathInformation = toy_deathinformation, BirthType_sel = "Captive", 
                   Models = "LO", Shape = "bathtub", MaxNSur = 10, MinNSur = 1,
                   niter = 1000, burnin = 101, thinning = 10, nchain = 3, ncpus = 3)
   
@@ -803,17 +803,17 @@ CalcCVx <- function( Sx,x, dx) {
 ```
 
 ```{r examples-Sur_ana}
-data(core)
-data(deathinformation)
-out <- Sur_ana(core,  DeathInformation = deathinformation, Models = "GO", Shape = "simple",
+data(toy_core)
+data(toy_deathinformation)
+out <- Sur_ana(toy_core,  DeathInformation = toy_deathinformation, Models = "GO", Shape = "simple",
                niter = 1000, burnin = 101, thinning = 10, nchain = 3, ncpus = 3)
 ```
 
 ```{r tests-Sur_ana}
 test_that("Sur_ana works", {
-  data(core)
-  data(deathinformation)
-  out <- Sur_ana(core, DeathInformation = deathinformation, Models = "GO", Shape = "bathtub",
+  data(toy_core)
+  data(toy_deathinformation)
+  out <- Sur_ana(toy_core, DeathInformation = toy_deathinformation, Models = "GO", Shape = "bathtub",
                  niter = 1000, burnin = 101, thinning = 10, nchain = 3, ncpus = 3,
                  LastDead = TRUE)
   expect_named(out, c("summary", "metrics", "bastaRes", "DICmods", 'KM_estimator', 'bastatab'))
@@ -833,9 +833,9 @@ test_that("Sur_ana works", {
 
 
 test_that("Sur_ana works2", {
-  data(core)
-  data(deathinformation)
-  out <- Sur_ana(core, DeathInformation = deathinformation, Models = "GO", Shape = "bathtub",
+  data(toy_core)
+  data(toy_deathinformation)
+  out <- Sur_ana(toy_core, DeathInformation = toy_deathinformation, Models = "GO", Shape = "bathtub",
                  niter = 1000, burnin = 101, thinning = 10, nchain = 3, ncpus = 3,
                  OutlLev1 = 100,MaxNSur=1000,
                  LastDead = TRUE)
@@ -1157,9 +1157,9 @@ Sur_out <- function(out,
 ```
 
 ```{r examples-Sur_out}
-data(core)
-data(deathinformation)
-out <- Sur_ana(core,  DeathInformation = deathinformation, 
+data(toy_core)
+data(toy_deathinformation)
+out <- Sur_ana(toy_core,  DeathInformation = toy_deathinformation, 
                Models = "GO", Shape = "simple",
                niter = 1000, burnin = 101, thinning = 10, nchain = 3, ncpus = 3)
 
@@ -1170,9 +1170,9 @@ out <- Sur_out(out, ncpus = 3)
 test_that("Sur_out works", {
   PlotDir = paste0(tempdir(check = TRUE),'/temp')
   dir.create(PlotDir)
-  data(core)
-  data(deathinformation)
-  out <- Sur_ana(core,  DeathInformation = deathinformation, Models = "GO", Shape = "simple",
+  data(toy_core)
+  data(toy_deathinformation)
+  out <- Sur_ana(toy_core,  DeathInformation = toy_deathinformation, Models = "GO", Shape = "simple",
                  niter = 1000, burnin = 101, thinning = 10, nchain = 3, ncpus = 3)
   out <- Sur_out(out, ncpus = 3, PlotDir = PlotDir)
   expect_named(out, c("summary","metrics",  "bastaRes", "DICmods", 'KM_estimator', "bastatab", "check", 'relex_from0', 'Sur5', 'Sur1', 'Sur1m'))
@@ -1367,9 +1367,9 @@ surv_Bastab <- function (coresubset, DeathInformation,
 ```
 
 ```{r examples-surv_Bastab}
-data(core)
-data(deathinformation)
-out<- surv_Bastab(core, DeathInformation = deathinformation,
+data(toy_core)
+data(toy_deathinformation)
+out<- surv_Bastab(toy_core, DeathInformation = toy_deathinformation,
                   EarliestDate = '1990-01-01', LatestDate = '2020-12-31', 
                   OtherCovars = "SexType", ExcludeStillBirth = TRUE)
 
@@ -1378,9 +1378,9 @@ out<- surv_Bastab(core, DeathInformation = deathinformation,
 
 ```{r tests-surv_Bastab}
 test_that("surv_Bastab works", {
-  data(core)
-  data(deathinformation)
-  out<- surv_Bastab(core, DeathInformation = deathinformation, LatestDate = '2020-12-31', 
+  data(toy_core)
+  data(toy_deathinformation)
+  out<- surv_Bastab(toy_core, DeathInformation = toy_deathinformation, LatestDate = '2020-12-31', 
                     OtherCovars = c('FirstHoldingInstitution','LastHoldingInstitution'), ExcludeStillBirth = TRUE)
   expect_named(out, c("AnimalAnonID", "binSpecies", "Class", "Order", "Family", "CommonName", "Birth.Date", "Min.Birth.Date", "Max.Birth.Date", "Entry.Date", "Depart.Date", 'Entry.Type', 'Depart.Type', 'FirstHoldingInstitution', 'LastHoldingInstitution'))
   expect_true(max(out$Depart.Date)<=lubridate::as_date('2020-12-31'))
@@ -2026,8 +2026,8 @@ select_Longthreshold <- function(Data,  SexCats = "All", MinN = 50,
 ```{r examples-select_Longthreshold}
 TempDir <- paste0(tempdir(check = TRUE),'/temp')
 dir.create(TempDir)
-data(core) #### CHANGE DATASET WITH ONE EXCLUDING ABOVE95 99 99.9
-out <- select_Longthreshold (Data = core,  SexCats = "All", 
+data(toy_core) #### CHANGE DATASET WITH ONE EXCLUDING ABOVE95 99 99.9
+out <- select_Longthreshold (Data = toy_core,  SexCats = "All", 
                              PlotDir = TempDir, PlotName = "Testudo_hermanni")
 list.files(TempDir)
 #reMove temporary folder
@@ -2038,8 +2038,8 @@ unlink(TempDir, recursive = TRUE)
 test_that("select_Longthreshold works", {
   TempDir <- paste0(tempdir(check = TRUE),'/temp')
   dir.create(TempDir)
-  data(core) #### CHANGE DATASET WITH ONE EXCLUDING ABOVE95 99 99.9
-  out <- select_Longthreshold (Data = core,  SexCats = "All", 
+  data(toy_core) #### CHANGE DATASET WITH ONE EXCLUDING ABOVE95 99 99.9
+  out <- select_Longthreshold (Data = toy_core,  SexCats = "All", 
                                PlotDir = TempDir, PlotName = "Testudo_hermanni")
   expect_true(file.exists(paste(TempDir, 'Testudo_hermanni_LongThres.pdf', sep = '/')))
   #reMove temporary folder
@@ -2047,8 +2047,8 @@ test_that("select_Longthreshold works", {
   expect_true("above95" %in% names(out$data))
   expect_named(out$summar, c("Sex", 'Nselect', "Nlifespan", "GapThresh", "NThres"))
   expect_true(out$summar$Sex == "All" )
-  expect_equal(out$summar$Nselect, nrow(core))
-  out <- select_Longthreshold (Data = core[1:30,],  SexCats = "Female", 
+  expect_equal(out$summar$Nselect, nrow(toy_core))
+  out <- select_Longthreshold (Data = toy_core[1:30,],  SexCats = "Female", 
                                PlotDir = TempDir, PlotName = "Testudo_hermanni")
   unlink(TempDir, recursive = TRUE)
 

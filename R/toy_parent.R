@@ -13,7 +13,7 @@
 #' \item{ParentCollectionScopeType}{Parent collection at offspring birth "Local" = Only private use or "Global" = Zims user use}
 #' }
 #'
-#' @usage data(parent)
+#' @usage data(toy_parent)
 #'
 #' @source Subset of a toy database created by the Species360 Development team in 08-2024
-"parent"
+"toy_parent"

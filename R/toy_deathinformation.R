@@ -9,7 +9,7 @@
 #' \item{RelevantDeathInformationType}{Cause of death}
 #' #' }
 #'
-#' @usage data(weights)
+#' @usage data(toy_deathinformation)
 #'
 #' @source Subset of a toy database created by the Species360 Development team in 08-2024
-"deathinformation"
+"toy_deathinformation"

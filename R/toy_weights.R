@@ -20,7 +20,7 @@
 #' \item{UnitOfMeasure}{Unit of Measure = kilogram}
 #' #' }
 #'
-#' @usage data(weights)
+#' @usage data(toy_weights)
 #'
 #' @source Subset of a toy database created by the Species360 Development team in 08-2024
-"weights"
+"toy_weights"

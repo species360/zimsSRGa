@@ -59,9 +59,9 @@ Departure dates later than \code{LatestDate} are truncated to \code{LatestDate},
 corresponding individuals are treated as right-censored.
 }
 \examples{
-data(core)
-data(deathinformation)
-out<- surv_Bastab(core, DeathInformation = deathinformation,
+data(toy_core)
+data(toy_deathinformation)
+out<- surv_Bastab(toy_core, DeathInformation = toy_deathinformation,
                   EarliestDate = '1990-01-01', LatestDate = '2020-12-31', 
                   OtherCovars = "SexType", ExcludeStillBirth = TRUE)
 

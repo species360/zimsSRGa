@@ -3,9 +3,9 @@
 test_that("Sur_out works", {
   PlotDir = paste0(tempdir(check = TRUE),'/temp')
   dir.create(PlotDir)
-  data(core)
-  data(deathinformation)
-  out <- Sur_ana(core,  DeathInformation = deathinformation, Models = "GO", Shape = "simple",
+  data(toy_core)
+  data(toy_deathinformation)
+  out <- Sur_ana(toy_core,  DeathInformation = toy_deathinformation, Models = "GO", Shape = "simple",
                  niter = 1000, burnin = 101, thinning = 10, nchain = 3, ncpus = 3)
   out <- Sur_out(out, ncpus = 3, PlotDir = PlotDir)
   expect_named(out, c("summary","metrics",  "bastaRes", "DICmods", 'KM_estimator', "bastatab", "check", 'relex_from0', 'Sur5', 'Sur1', 'Sur1m'))

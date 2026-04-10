@@ -106,15 +106,15 @@ DIC table comparing the fit of the different models * the remaining life
 expectancy per age * key survival metrics * Statistics to check the fit
 of the selected model</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">core</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">deathinformation</span><span class="op">)</span></span>
-<span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/Sur_main.html">Sur_main</a></span><span class="op">(</span><span class="va">core</span>, DeathInformation <span class="op">=</span> <span class="va">deathinformation</span>, BirthType_sel <span class="op">=</span> <span class="st">"All"</span>,</span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">toy_core</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">toy_deathinformation</span><span class="op">)</span></span>
+<span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/Sur_main.html">Sur_main</a></span><span class="op">(</span><span class="va">toy_core</span>, DeathInformation <span class="op">=</span> <span class="va">toy_deathinformation</span>, BirthType_sel <span class="op">=</span> <span class="st">"All"</span>,</span>
 <span>                Models <span class="op">=</span> <span class="st">"GO"</span>, Shape <span class="op">=</span> <span class="st">"simple"</span>,</span>
 <span>                niter <span class="op">=</span> <span class="fl">1000</span>, burnin <span class="op">=</span> <span class="fl">101</span>, thinning <span class="op">=</span> <span class="fl">10</span>, nchain <span class="op">=</span> <span class="fl">3</span>, ncpus <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "GO"</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Running sequence to find jump SDs... Done</span></span>
-<span><span class="co">#&gt; Total jump SDs computing time: 10.14 secs.</span></span>
+<span><span class="co">#&gt; Total jump SDs computing time: 10.43 secs.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Multiple simulations started...</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -125,7 +125,7 @@ of the selected model</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Stopping cluster</span></span>
 <span><span class="co">#&gt; Simulations finished.</span></span>
-<span><span class="co">#&gt; Total MCMC computing time: 6.35 secs.</span></span>
+<span><span class="co">#&gt; Total MCMC computing time: 6.53 secs.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Calculating summary statistics... Done.</span></span>
 <span><span class="co">#&gt; All parameters converged properly.</span></span>
@@ -173,14 +173,14 @@ Kaplan-Meier estimator and associated key metrics * Key survival metrics
 from raw data * the BaSTA fit of the best model * the DIC table
 comparing the different fit of the Models</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">core</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">deathinformation</span><span class="op">)</span></span>
-<span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/Sur_ana.html">Sur_ana</a></span><span class="op">(</span><span class="va">core</span>,  DeathInformation <span class="op">=</span> <span class="va">deathinformation</span>, Models <span class="op">=</span> <span class="st">"GO"</span>, Shape <span class="op">=</span> <span class="st">"simple"</span>,</span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">toy_core</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">toy_deathinformation</span><span class="op">)</span></span>
+<span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/Sur_ana.html">Sur_ana</a></span><span class="op">(</span><span class="va">toy_core</span>,  DeathInformation <span class="op">=</span> <span class="va">toy_deathinformation</span>, Models <span class="op">=</span> <span class="st">"GO"</span>, Shape <span class="op">=</span> <span class="st">"simple"</span>,</span>
 <span>               niter <span class="op">=</span> <span class="fl">1000</span>, burnin <span class="op">=</span> <span class="fl">101</span>, thinning <span class="op">=</span> <span class="fl">10</span>, nchain <span class="op">=</span> <span class="fl">3</span>, ncpus <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "GO"</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Running sequence to find jump SDs... Done</span></span>
-<span><span class="co">#&gt; Total jump SDs computing time: 9.90 secs.</span></span>
+<span><span class="co">#&gt; Total jump SDs computing time: 10.30 secs.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Multiple simulations started...</span></span>
 <span><span class="co">#&gt; snowfall 1.84-6.3 initialized (using snow 0.4-4): parallel execution on 3 CPUs.</span></span>
@@ -189,7 +189,7 @@ comparing the different fit of the Models</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Stopping cluster</span></span>
 <span><span class="co">#&gt; Simulations finished.</span></span>
-<span><span class="co">#&gt; Total MCMC computing time: 6.29 secs.</span></span>
+<span><span class="co">#&gt; Total MCMC computing time: 6.32 secs.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Calculating summary statistics... Done.</span></span>
 <span><span class="co">#&gt; All parameters converged properly.</span></span>
@@ -216,15 +216,15 @@ from age at sexual maturity. * A check list * the remaining life
 expectancy per age (relex_from0) * the probability to live 5 years more
 (Sur5) * Age-specific survival (Sur1) * The monthly survival (Sur1m)</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">core</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">deathinformation</span><span class="op">)</span></span>
-<span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/Sur_ana.html">Sur_ana</a></span><span class="op">(</span><span class="va">core</span>,  DeathInformation <span class="op">=</span> <span class="va">deathinformation</span>, </span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">toy_core</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">toy_deathinformation</span><span class="op">)</span></span>
+<span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/Sur_ana.html">Sur_ana</a></span><span class="op">(</span><span class="va">toy_core</span>,  DeathInformation <span class="op">=</span> <span class="va">toy_deathinformation</span>, </span>
 <span>               Models <span class="op">=</span> <span class="st">"GO"</span>, Shape <span class="op">=</span> <span class="st">"simple"</span>,</span>
 <span>               niter <span class="op">=</span> <span class="fl">1000</span>, burnin <span class="op">=</span> <span class="fl">101</span>, thinning <span class="op">=</span> <span class="fl">10</span>, nchain <span class="op">=</span> <span class="fl">3</span>, ncpus <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "GO"</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Running sequence to find jump SDs... Done</span></span>
-<span><span class="co">#&gt; Total jump SDs computing time: 10.01 secs.</span></span>
+<span><span class="co">#&gt; Total jump SDs computing time: 10.46 secs.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Multiple simulations started...</span></span>
 <span><span class="co">#&gt; snowfall 1.84-6.3 initialized (using snow 0.4-4): parallel execution on 3 CPUs.</span></span>
@@ -233,7 +233,7 @@ expectancy per age (relex_from0) * the probability to live 5 years more
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Stopping cluster</span></span>
 <span><span class="co">#&gt; Simulations finished.</span></span>
-<span><span class="co">#&gt; Total MCMC computing time: 6.22 secs.</span></span>
+<span><span class="co">#&gt; Total MCMC computing time: 6.52 secs.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Calculating summary statistics... Done.</span></span>
 <span><span class="co">#&gt; All parameters converged properly.</span></span>
@@ -285,9 +285,9 @@ date later than LatestDate * Depart dates later than LatestDate are
 changed to latest date. These individuals are considered
 right-censored.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">core</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">deathinformation</span><span class="op">)</span></span>
-<span><span class="va">out</span><span class="op">&lt;-</span> <span class="fu"><a href="../reference/surv_Bastab.html">surv_Bastab</a></span><span class="op">(</span><span class="va">core</span>, DeathInformation <span class="op">=</span> <span class="va">deathinformation</span>,</span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">toy_core</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">toy_deathinformation</span><span class="op">)</span></span>
+<span><span class="va">out</span><span class="op">&lt;-</span> <span class="fu"><a href="../reference/surv_Bastab.html">surv_Bastab</a></span><span class="op">(</span><span class="va">toy_core</span>, DeathInformation <span class="op">=</span> <span class="va">toy_deathinformation</span>,</span>
 <span>                  EarliestDate <span class="op">=</span> <span class="st">'1990-01-01'</span>, LatestDate <span class="op">=</span> <span class="st">'2020-12-31'</span>, </span>
 <span>                  OtherCovars <span class="op">=</span> <span class="st">"SexType"</span>, ExcludeStillBirth <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -446,8 +446,8 @@ gaps if <code>PlotDir</code> is given.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">TempDir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span>check <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,<span class="st">'/temp'</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">TempDir</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">core</span><span class="op">)</span> <span class="co">#### CHANGE DATASET WITH ONE EXCLUDING ABOVE95 99 99.9</span></span>
-<span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/select_Longthreshold.html">select_Longthreshold</a></span> <span class="op">(</span>Data <span class="op">=</span> <span class="va">core</span>,  SexCats <span class="op">=</span> <span class="st">"All"</span>, </span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">toy_core</span><span class="op">)</span> <span class="co">#### CHANGE DATASET WITH ONE EXCLUDING ABOVE95 99 99.9</span></span>
+<span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/select_Longthreshold.html">select_Longthreshold</a></span> <span class="op">(</span>Data <span class="op">=</span> <span class="va">toy_core</span>,  SexCats <span class="op">=</span> <span class="st">"All"</span>, </span>
 <span>                             PlotDir <span class="op">=</span> <span class="va">TempDir</span>, PlotName <span class="op">=</span> <span class="st">"Testudo_hermanni"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">TempDir</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "Testudo_hermanni_LongThres.pdf"</span></span>

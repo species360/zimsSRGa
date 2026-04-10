@@ -281,15 +281,15 @@ was successful
 ## Examples
 
 ``` r
-data(core)
-data(deathinformation)
-out <- Sur_main(core, DeathInformation = deathinformation, BirthType_sel = "All",
+data(toy_core)
+data(toy_deathinformation)
+out <- Sur_main(toy_core, DeathInformation = toy_deathinformation, BirthType_sel = "All",
                 Models = "GO", Shape = "simple",
                 niter = 1000, burnin = 101, thinning = 10, nchain = 3, ncpus = 3)
 #> [1] "GO"
 #> 
 #> Running sequence to find jump SDs... Done
-#> Total jump SDs computing time: 9.84 secs.
+#> Total jump SDs computing time: 10.39 secs.
 #> 
 #> Multiple simulations started...
 #> 
@@ -300,7 +300,7 @@ out <- Sur_main(core, DeathInformation = deathinformation, BirthType_sel = "All"
 #> 
 #> Stopping cluster
 #> Simulations finished.
-#> Total MCMC computing time: 6.15 secs.
+#> Total MCMC computing time: 6.40 secs.
 #> 
 #> Calculating summary statistics... Done.
 #> All parameters converged properly.

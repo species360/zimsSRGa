@@ -218,14 +218,14 @@ on `CalculateMetricsFrom` and whether model fitting succeeded.
 ## Examples
 
 ``` r
-data(core)
-data(deathinformation)
-out <- Sur_ana(core,  DeathInformation = deathinformation, Models = "GO", Shape = "simple",
+data(toy_core)
+data(toy_deathinformation)
+out <- Sur_ana(toy_core,  DeathInformation = toy_deathinformation, Models = "GO", Shape = "simple",
                niter = 1000, burnin = 101, thinning = 10, nchain = 3, ncpus = 3)
 #> [1] "GO"
 #> 
 #> Running sequence to find jump SDs... Done
-#> Total jump SDs computing time: 10.00 secs.
+#> Total jump SDs computing time: 10.44 secs.
 #> 
 #> Multiple simulations started...
 #> 
@@ -238,7 +238,7 @@ out <- Sur_ana(core,  DeathInformation = deathinformation, Models = "GO", Shape 
 #> 
 #> Stopping cluster
 #> Simulations finished.
-#> Total MCMC computing time: 6.22 secs.
+#> Total MCMC computing time: 6.49 secs.
 #> 
 #> Calculating summary statistics... Done.
 #> All parameters converged properly.

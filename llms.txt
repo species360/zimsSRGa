@@ -65,8 +65,8 @@ MinBirthKnown = 0.3 #Minimum proportions of known birth dates (within a month)
 MinMLE = 0.1 #Minimum survivorship at Mean life expectancy
 MaxLE = 2     #Maximum remaining life expectancy at max age
 
-data(core)
-data(deathinformation)
+data(toy_core)
+data(toy_deathinformation)
 out = list()
 # Run survival Analysis---------------------------------------------------------
     ## Loop over sexes
@@ -116,16 +116,17 @@ out = list()
 - [`Sur_ple()`](Sur_ple.md) : Kaplan-Meier estimator
 - [`Sur_relex()`](Sur_relex.md) : Remaining life expectancy
 - [`Sur_xx()`](Sur_xx.md) : Survivorship quantile
-- [`collection`](collection.md) : Collection data
-- [`core`](core.md) : Animal data
-- [`weights`](deathinformation.md) : Death Information data
 - [`find_gaps()`](find_gaps.md) : Find gaps in an integer variable
-- [`parent`](parent.md) : Parent data
 - [`select_Longthreshold()`](select_Longthreshold.md) : Gap analysis in
   longevity
 - [`surv_Bastab()`](surv_Bastab.md) : Checks required columns and the
   logical succession of dates, then formats the data for use in BaSTA.
-- [`weights`](weights.md) : Weights data
+- [`toy_collection`](toy_collection.md) : Collection data
+- [`toy_core`](toy_core.md) : Animal data
+- [`toy_deathinformation`](toy_deathinformation.md) : Death Information
+  data
+- [`toy_parent`](toy_parent.md) : Parent data
+- [`toy_weights`](toy_weights.md) : Weights data
 
 # Articles
 

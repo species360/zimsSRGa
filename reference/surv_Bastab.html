@@ -112,9 +112,9 @@ corresponding individuals are treated as right-censored.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">core</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">deathinformation</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">out</span><span class="op">&lt;-</span> <span class="fu">surv_Bastab</span><span class="op">(</span><span class="va">core</span>, DeathInformation <span class="op">=</span> <span class="va">deathinformation</span>,</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">toy_core</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">toy_deathinformation</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">out</span><span class="op">&lt;-</span> <span class="fu">surv_Bastab</span><span class="op">(</span><span class="va">toy_core</span>, DeathInformation <span class="op">=</span> <span class="va">toy_deathinformation</span>,</span></span>
 <span class="r-in"><span>                  EarliestDate <span class="op">=</span> <span class="st">'1990-01-01'</span>, LatestDate <span class="op">=</span> <span class="st">'2020-12-31'</span>, </span></span>
 <span class="r-in"><span>                  OtherCovars <span class="op">=</span> <span class="st">"SexType"</span>, ExcludeStillBirth <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>

@@ -115,15 +115,15 @@ The output list of the survival analysis including, in addition:
 ## Examples
 
 ``` r
-data(core)
-data(deathinformation)
-out <- Sur_ana(core,  DeathInformation = deathinformation, 
+data(toy_core)
+data(toy_deathinformation)
+out <- Sur_ana(toy_core,  DeathInformation = toy_deathinformation, 
                Models = "GO", Shape = "simple",
                niter = 1000, burnin = 101, thinning = 10, nchain = 3, ncpus = 3)
 #> [1] "GO"
 #> 
 #> Running sequence to find jump SDs... Done
-#> Total jump SDs computing time: 9.79 secs.
+#> Total jump SDs computing time: 10.20 secs.
 #> 
 #> Multiple simulations started...
 #> 
@@ -134,7 +134,7 @@ out <- Sur_ana(core,  DeathInformation = deathinformation,
 #> 
 #> Stopping cluster
 #> Simulations finished.
-#> Total MCMC computing time: 6.27 secs.
+#> Total MCMC computing time: 6.30 secs.
 #> 
 #> Calculating summary statistics... Done.
 #> All parameters converged properly.

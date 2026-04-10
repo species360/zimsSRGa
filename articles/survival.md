@@ -32,15 +32,15 @@ different models \* the remaining life expectancy per age \* key
 survival metrics \* Statistics to check the fit of the selected model
 
 ``` r
-data(core)
-data(deathinformation)
-out <- Sur_main(core, DeathInformation = deathinformation, BirthType_sel = "All",
+data(toy_core)
+data(toy_deathinformation)
+out <- Sur_main(toy_core, DeathInformation = toy_deathinformation, BirthType_sel = "All",
                 Models = "GO", Shape = "simple",
                 niter = 1000, burnin = 101, thinning = 10, nchain = 3, ncpus = 3)
 #> [1] "GO"
 #> 
 #> Running sequence to find jump SDs... Done
-#> Total jump SDs computing time: 10.14 secs.
+#> Total jump SDs computing time: 10.43 secs.
 #> 
 #> Multiple simulations started...
 #> 
@@ -51,7 +51,7 @@ out <- Sur_main(core, DeathInformation = deathinformation, BirthType_sel = "All"
 #> 
 #> Stopping cluster
 #> Simulations finished.
-#> Total MCMC computing time: 6.35 secs.
+#> Total MCMC computing time: 6.53 secs.
 #> 
 #> Calculating summary statistics... Done.
 #> All parameters converged properly.
@@ -98,14 +98,14 @@ the best model \* the DIC table comparing the different fit of the
 Models
 
 ``` r
-data(core)
-data(deathinformation)
-out <- Sur_ana(core,  DeathInformation = deathinformation, Models = "GO", Shape = "simple",
+data(toy_core)
+data(toy_deathinformation)
+out <- Sur_ana(toy_core,  DeathInformation = toy_deathinformation, Models = "GO", Shape = "simple",
                niter = 1000, burnin = 101, thinning = 10, nchain = 3, ncpus = 3)
 #> [1] "GO"
 #> 
 #> Running sequence to find jump SDs... Done
-#> Total jump SDs computing time: 9.90 secs.
+#> Total jump SDs computing time: 10.30 secs.
 #> 
 #> Multiple simulations started...
 #> snowfall 1.84-6.3 initialized (using snow 0.4-4): parallel execution on 3 CPUs.
@@ -114,7 +114,7 @@ out <- Sur_ana(core,  DeathInformation = deathinformation, Models = "GO", Shape 
 #> 
 #> Stopping cluster
 #> Simulations finished.
-#> Total MCMC computing time: 6.29 secs.
+#> Total MCMC computing time: 6.32 secs.
 #> 
 #> Calculating summary statistics... Done.
 #> All parameters converged properly.
@@ -139,15 +139,15 @@ expectancy per age (relex_from0) \* the probability to live 5 years more
 (Sur5) \* Age-specific survival (Sur1) \* The monthly survival (Sur1m)
 
 ``` r
-data(core)
-data(deathinformation)
-out <- Sur_ana(core,  DeathInformation = deathinformation, 
+data(toy_core)
+data(toy_deathinformation)
+out <- Sur_ana(toy_core,  DeathInformation = toy_deathinformation, 
                Models = "GO", Shape = "simple",
                niter = 1000, burnin = 101, thinning = 10, nchain = 3, ncpus = 3)
 #> [1] "GO"
 #> 
 #> Running sequence to find jump SDs... Done
-#> Total jump SDs computing time: 10.01 secs.
+#> Total jump SDs computing time: 10.46 secs.
 #> 
 #> Multiple simulations started...
 #> snowfall 1.84-6.3 initialized (using snow 0.4-4): parallel execution on 3 CPUs.
@@ -156,7 +156,7 @@ out <- Sur_ana(core,  DeathInformation = deathinformation,
 #> 
 #> Stopping cluster
 #> Simulations finished.
-#> Total MCMC computing time: 6.22 secs.
+#> Total MCMC computing time: 6.52 secs.
 #> 
 #> Calculating summary statistics... Done.
 #> All parameters converged properly.
@@ -196,9 +196,9 @@ date later than LatestDate \* Depart dates later than LatestDate are
 changed to latest date. These individuals are considered right-censored.
 
 ``` r
-data(core)
-data(deathinformation)
-out<- surv_Bastab(core, DeathInformation = deathinformation,
+data(toy_core)
+data(toy_deathinformation)
+out<- surv_Bastab(toy_core, DeathInformation = toy_deathinformation,
                   EarliestDate = '1990-01-01', LatestDate = '2020-12-31', 
                   OtherCovars = "SexType", ExcludeStillBirth = TRUE)
 ```
@@ -327,8 +327,8 @@ of longevity. It plots the distribution of longevity with gaps if
 ``` r
 TempDir <- paste0(tempdir(check = TRUE),'/temp')
 dir.create(TempDir)
-data(core) #### CHANGE DATASET WITH ONE EXCLUDING ABOVE95 99 99.9
-out <- select_Longthreshold (Data = core,  SexCats = "All", 
+data(toy_core) #### CHANGE DATASET WITH ONE EXCLUDING ABOVE95 99 99.9
+out <- select_Longthreshold (Data = toy_core,  SexCats = "All", 
                              PlotDir = TempDir, PlotName = "Testudo_hermanni")
 list.files(TempDir)
 #> [1] "Testudo_hermanni_LongThres.pdf"

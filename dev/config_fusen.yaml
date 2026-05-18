@@ -1,3 +1,53 @@
+flat_growth.Rmd:
+  path: dev/flat_growth.Rmd
+  state: active
+  R: R/gro_rout_quan.R
+  tests: tests/testthat/test-gro_rout_quan.R
+  vignettes: vignettes/growth.Rmd
+  inflate:
+    flat_file: dev/flat_growth.Rmd
+    vignette_name: Growth
+    open_vignette: true
+    check: true
+    document: true
+    overwrite: ask
+    clean: ask
+    codecov: false
+flat_repro.Rmd:
+  path: dev/flat_repro.Rmd
+  state: active
+  R:
+  - R/rep_agemat.R
+  - R/rep_birthinterval.R
+  - R/rep_fert.R
+  - R/rep_littersize.R
+  - R/rep_lrs.R
+  - R/rep_main.R
+  - R/rep_pattern.R
+  - R/rep_prepdata.R
+  - R/rep_season.R
+  - R/rep_weight1strepro.R
+  tests:
+  - tests/testthat/test-rep_main.R
+  - tests/testthat/test-rep_agemat.R
+  - tests/testthat/test-rep_littersize.R
+  - tests/testthat/test-rep_birthinterval.R
+  - tests/testthat/test-rep_fert.R
+  - tests/testthat/test-rep_season.R
+  - tests/testthat/test-rep_pattern.R
+  - tests/testthat/test-rep_weight1strepro.R
+  - tests/testthat/test-rep_lrs.R
+  - tests/testthat/test-rep_prepdata.R
+  vignettes: vignettes/reproduction.Rmd
+  inflate:
+    flat_file: dev/flat_repro.Rmd
+    vignette_name: Reproduction
+    open_vignette: true
+    check: true
+    document: true
+    overwrite: ask
+    clean: ask
+    codecov: false
 flat_survival.Rmd:
   path: dev/flat_survival.Rmd
   state: active

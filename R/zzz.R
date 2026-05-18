@@ -41,4 +41,11 @@ globalVariables(c("Age", "anonID", "MeasurementValue", "age0", "agem", "ager", "
     "Surv_Ana", "Surv_error", "firstage", "model", "param", "stat",
     "value","Gof_KM_coeff1_Raw", "IC", "Snd", "ALLcheck", "BirthDateEstimateType",
     "CV_KM","CV_Model","Epx_KM","Epx_Model","Ex_KM","G_KM","G_Model","L50_Raw","L90_Raw",
-    "MLE_KM","MLE_Model","MLE_Raw","agedeath","remex0_Model"))
+    "MLE_KM","MLE_Model","MLE_Raw","agedeath","remex0_Model",
+    "DayOfYear","Fert","FertRate_Par","FertSD","FertSE","Firstyear","Institution",
+    "Latitude MeasurmentValue Month Nads Nfemale Nmale Npar",
+    "OffspringAnonID","PRep","PRepSE","PRep_Par","ParentAge","SDlittSize","SR","SRSE",
+    "Status","earmat","ageMat","ageold","bin_high","bin_id","bin_low","bin_mid","data",
+    "fit","fixef","interval","interval_days","interval_rounded","maturity_num",
+    "next_birth","percent_forma","pred_data","upr","iLatitude","iMeasurmentValue","Month",
+    "Nads","Nfemale","Nmale","Npar","Yearmat"))

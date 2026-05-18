@@ -69,6 +69,39 @@ usethis::use_news_md()
 
 **From now, you will need to "inflate" your package at least once to be able to use the following commands. Let's go to your flat template, and come back here later if/when needed.**
 
+#Dataset simulated
+```{r}
+
+##Institution & Moves
+
+data(toy_core)
+
+toy_moves = toy_core%>%
+  select(AnimalAnonID, FirstHoldingInstitution,BirthDate)%>%
+  rename(To = FirstHoldingInstitution,
+         Date = BirthDate)
+
+
+save(toy_moves,
+     file="data/toy_moves.rdata")
+# make dataset available for user
+usethis::use_data(toy_moves, overwrite = TRUE)
+
+
+toy_weights=weights #loaded from ISRverse
+save(toy_weights,
+     file="data/toy_weights.rdata")
+# make dataset available for user
+usethis::use_data(toy_weights, overwrite = TRUE)
+
+toy_parent=parent #loaded from ISRverse
+save(toy_parent,
+     file="data/toy_parent.rdata")
+# make dataset available for user
+usethis::use_data(toy_parent, overwrite = TRUE)
+
+```
+
 
 # Package development tools
 ## Use once

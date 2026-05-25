@@ -23,5 +23,10 @@ Research Request process
 Species360 Conservation Science Alliance by email, referencing the
 Research Request number associated with this study (RR#96528).
 
+<<<<<<< HEAD
 The full dataset is available here: [Results
 Data](Main_Supp_tablesh.csv)
+=======
+The full dataset is available here:
+<https://species360.github.io/zimsSRGa/tree/inst/extdata/Main_Supp_tablesh.csv>
+>>>>>>> f8078b6bfe8ca81a813b6587745aca6c04724143

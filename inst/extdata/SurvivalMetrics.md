@@ -24,7 +24,7 @@ Species360 Conservation Science Alliance by email, referencing the
 Research Request number associated with this study (RR#96528).
 
 The full dataset is available here:
-<https://species360.github.io/zimsSRGa/data/Main_Supp_tablesh.csv>
+<https://species360.github.io/zimsSRGa/inst/extdata/Main_Supp_tablesh.csv>
 
 ## L50
 

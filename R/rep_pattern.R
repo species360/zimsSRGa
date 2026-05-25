@@ -113,7 +113,11 @@ Rep_pattern <- function(ReproData,
   aic0 <- AIC(mod0)
   AIC_detailed <- add_row(AIC_detailed, Model = "Null", T1 = NA, T2 = NA, 
                           AIC = aic0, k = "1")
-  preds0 <- rep.int(predict(mod0, type = "response"), length(ages))
+  temp=predict(mod0, newdata= tibble(LS = rep(1,length(ages))),type = "link", se.fit = TRUE)
+  preds0 <- tibble(Age = ages,
+                   RS = exp(temp$fit),
+                   lower = exp(temp$fit-1.96*temp$se.fit),
+                   upper = exp(temp$fit+1.96*temp$se.fit))
   
   # One-threshold model
   best1 <- list(aic = Inf)
@@ -126,37 +130,47 @@ Rep_pattern <- function(ReproData,
     AIC_detailed <- add_row(AIC_detailed, Model = "1-threshold", 
                             T1 = T1, T2 = NA, AIC = aic_adj, k = "2+1")
     if (aic_adj < best1$aic) {
-      preds <- predict(mod, newdata = data.frame(
+      temp = predict(mod, newdata = data.frame(
         Age = ages,
         a1 = ifelse(ages < T1, ages - T1, 0),
         a2 = ifelse(ages > T1, ages - T1, 0)
-      ), type = "response")
+      ), type = "link", se.fit = TRUE)
+      preds <- tibble(Age = ages,
+                   RS = exp(temp$fit),
+                   lower = exp(temp$fit-1.96*temp$se.fit),
+                   upper = exp(temp$fit+1.96*temp$se.fit))
       best1 <- list(mod = mod, T1 = T1, aic = aic_adj, preds = preds)
     }
   }
   
   # Two-threshold model
    best2 <- list(aic = Inf)
-  for (i in 1:(nAges - 1)) {
-    for (j in (i + 1):nAges) {
+  for (i in 1:(nAges - 2)) {
+    for (j in (i + 1):(nAges-1)) {
       T1 <- ages[i]
       T2 <- ages[j]
       d <- data %>%
         mutate(a1 = ifelse(Age < T1, Age - T1, 0),
-               a2 = ifelse(Age >= T1 & Age <= T2, Age - T1, 0),
+               a2 = ifelse(Age < T2, Age - T1, T2-T1),
+               a2 = ifelse(Age >= T1, 0, a2),
                a3 = ifelse(Age > T2, Age - T2, 0))
       mod <- glm(LS ~ a1 + a2 + a3, data = d, family = poisson())
       aic_adj <- AIC(mod) + 4
       AIC_detailed <- add_row(AIC_detailed, Model = "2-threshold",
                               T1 = T1, T2 = T2, AIC = aic_adj, k = "3+2")
       if (aic_adj < best2$aic) {
-        preds <- predict(mod, newdata = data.frame(
-          Age = ages,
-          a1 = ifelse(ages < T1, ages - T1, 0),
-          a2 = ifelse(ages >= T1 & ages <= T2, ages - T1, 0),
-          a3 = ifelse(ages > T2, ages - T2, 0)
-        ), type = "response")
-        best2 <- list(mod = mod, T1 = T1, T2 = T2, aic = aic_adj, preds = preds)
+             temp = predict(mod, newdata = data.frame(
+          Age = ages)%>%mutate(
+          a1 = ifelse(Age < T1, Age - T1, 0),
+               a2 = ifelse(Age < T2, Age - T1, T2-T1),
+               a2 = ifelse(Age >= T1, 0, a2),
+               a3 = ifelse(Age > T2, Age - T2, 0)
+        ), type = "link", se.fit = TRUE)
+      preds <- tibble(Age = ages,
+                   RS = exp(temp$fit),
+                   lower = exp(temp$fit-1.96*temp$se.fit),
+                   upper = exp(temp$fit+1.96*temp$se.fit))
+           best2 <- list(mod = mod, T1 = T1, T2 = T2, aic = aic_adj, preds = preds)
       }
     }
   }
@@ -173,13 +187,67 @@ Rep_pattern <- function(ReproData,
                   "0" = preds0,
                   "1" = best1$preds,
                   "2" = best2$preds)
-MaxAgeLS <- ages[which.max(preds)]
+MaxAgeLS <- max(preds$Age)
   
   summary$analyzed <- TRUE
-  summary$model_type <- final_model 
+  summary$model_type <- switch(as.character(model_type),
+                  "0" = "constant",
+                  "1" = "1-treshold",
+                  "2" = "2-tresholds")
   summary$T1 <- if (model_type == 1) best1$T1 else if (model_type == 2) best2$T1 else NA
   summary$T2 <- if (model_type == 2) best2$T2 else NA
   summary$MaxAgeLS <- MaxAgeLS
   
-  return(list(summary = summary, model = final_model, AIC_detailed = AIC_detailed, predictions = preds))
+
+  p = ggplot() +
+
+  # Model confidence ribbon
+  geom_ribbon(
+    data = preds,
+    aes(x = Age, ymin = lower, ymax = upper),
+    fill = "brown",
+    alpha = 0.18
+  ) +
+
+  # Model prediction line
+  geom_line(
+    data =preds,
+    aes(x = Age,  y = RS),
+    color = "brown",
+    linewidth = 1.2
+  ) +
+  # Observed percentage points
+  geom_point(
+    data = data%>%mutate(age = round(Age))%>%
+      group_by(age)%>%
+      summarise(RS = mean(LS), 
+                lower = quantile(LS,0.05), 
+                upper = quantile(LS,0.95), 
+                N= n()),
+    aes(x = age, y = RS, size = N),
+    shape = 21,
+    fill = "white",
+    color = "black",
+    stroke = 0.8
+  ) +
+  
+  scale_size_continuous(
+    range = c(2.5, 6),
+    guide = "none"
+  ) +
+
+  labs(
+    x = "Age",
+    y = "Fertility",
+    ) +
+
+  theme_classic(base_size = 14) +
+  theme(
+      axis.title = element_text(face = "bold"),
+    axis.text = element_text(color = "black"),
+    legend.position = "none"
+  )
+
+  
+  return(list(summary = summary, model = final_model, AIC_detailed = AIC_detailed, predictions = preds, p = p))
 }

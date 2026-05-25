@@ -160,7 +160,7 @@ if("Season" %in% RepSect){
   if ("agemat" %in% RepSect) {
     out[["agemat"]] <- Rep_agemat(subfert)
     out$summary$sections$agemat <- TRUE
-    AgeMat = floor(out[["agemat"]]$age1RepQuant[[1]][1])
+    AgeMat = floor(out[["agemat"]]$summary$age1RepQuant[[1]][1])
   }
   
   ### --- 2. Litter size
@@ -202,7 +202,7 @@ if("Season" %in% RepSect){
   if ("season" %in% RepSect) {
     out[["season"]] <- Rep_season(subfert, institution,  MinNBirth = MinNSeas,
                                   Hemisphere  = c("North", "South", "All"))
-    out$summary$sections$season <- out[["season"]]$summary$analyzed
+    out$summary$sections$season <- out[["season"]]$summary$All$analyzed
   }
   
    ### --- 6. Model of age-specific reproductive success
@@ -251,7 +251,7 @@ if("Season" %in% RepSect){
     )
     out$summary$sections$LRS <- out[["LRS"]]$summary$analyzed
     }else{
-      out$summary$sections$LRS <- "no lx or no mx"
+      out$summary$sections$LRS <- FALSE
     }
   }
   

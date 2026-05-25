@@ -76,7 +76,7 @@ Rep_littersize <- function(ReproData,
            Probability >= ParentPercSire) %>%
     transmute(FatherAnonID = ParentAnonID,
               AnimalAnonID,
-              Father_Age = round(ParentAge, 2)) %>%
+              Father_Age = round(ParentAge, 1)) %>%
     distinct()
   
   # Filter dams and join sires

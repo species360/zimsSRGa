@@ -88,6 +88,14 @@ Rep_agemat <- function(ReproData) {
     dplyr::select(ParentAnonID, ParentAge, GlobalStatus)%>%
     distinct()
   
+p= ggplot(ReproDataD , aes(x=round(ParentAge,1)))+
+              ggplot2::geom_histogram(fill = "grey70", color = "grey30", binwidth = 1) +
+              ggplot2::labs(
+                x = "Parent Age",
+                y = "N",
+             ) +
+              ggplot2::theme_classic()
+  
   TageMatold = TageMat%>%filter(GlobalStatus == "Dead")
   
   fertSumm$N_par_agemat  = nrow(TageMat)
@@ -128,6 +136,6 @@ Rep_agemat <- function(ReproData) {
   if(!is.na( fertSumm$ReproLifespanMean)) {fertSumm$ReproLifespanMax = max(as.numeric(TageMatold$ReproLifespan), na.rm = TRUE)
   }else{fertSumm$ReproLifespanMax =NA}
   fertSumm$ReproLifespanQuant = list(quantile(TageMatold$ReproLifespan, c(0.025,0.975), na.rm = TRUE))
-  
-  return(fertSumm)
+
+  return(list(summary = fertSumm,p=p))
 }

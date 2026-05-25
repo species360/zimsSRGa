@@ -289,7 +289,7 @@ out <- Sur_main(toy_core, DeathInformation = toy_deathinformation, BirthType_sel
 #> [1] "GO"
 #> 
 #> Running sequence to find jump SDs... Done
-#> Total jump SDs computing time: 9.33 secs.
+#> Total jump SDs computing time: 9.88 secs.
 #> 
 #> Multiple simulations started...
 #> 
@@ -300,7 +300,7 @@ out <- Sur_main(toy_core, DeathInformation = toy_deathinformation, BirthType_sel
 #> 
 #> Stopping cluster
 #> Simulations finished.
-#> Total MCMC computing time: 3.68 secs.
+#> Total MCMC computing time: 3.97 secs.
 #> 
 #> Calculating summary statistics... Done.
 #> All parameters converged properly.

@@ -130,7 +130,7 @@ Rep_weight1strepro <- function(AnimalData, parent, GrowthData,
            RecordType == "")
   
   # Remove outliers
-  v = Gro_Rout_quan(z =  GrowthData$MeasurementValue, x =  rep(1, nrow( GrowthData)),  
+  v = Gro_Rout_quan(z =  GrowthData$MeasurementValue, x =  GrowthData$Age,  
                     minq = 0.05, type = "upper")
   GrowthData =  GrowthData[v==1,]
 
@@ -170,7 +170,7 @@ filter(AnimalAnonID  %in% AnimalData$AnimalAnonID,
       Firstyear = coalesce(BirthDate, Yearmat),
       maturity = as.integer(as_date(MeasurementDate) >= as_date(Yearmat))
     ) %>%
-    tidyr::drop_na(Firstyear, MeasurementValue)
+    tidyr::drop_na(Firstyear, MeasurementValue, maturity)
   
   summary$Nmeasures <- nrow(TsizeMat)
   summary$NMat <- sum(TsizeMat$maturity == 1, na.rm = TRUE)
@@ -180,8 +180,7 @@ filter(AnimalAnonID  %in% AnimalData$AnimalAnonID,
  summary$SDWeight <- sd(TsizeMat$MeasurementValue)
   
   TsizeMat <-  TsizeMat %>%
-    mutate(MeasureSD = (MeasurementValue -summary$MeanWeight)/ summary$SDWeight )%>%
-    tidyr::drop_na(maturity)
+    mutate(MeasureSD = (MeasurementValue -summary$MeanWeight)/ summary$SDWeight )
  
   # --- Check thresholds
   if (summary$Nmeasures < MinNMeasures) {
@@ -201,25 +200,7 @@ filter(AnimalAnonID  %in% AnimalData$AnimalAnonID,
     return(list(summary = summary))
   }
   
-  # Fit maturity model -----------------------------------------------------
-  mod = glmer(maturity~MeasureSD + (1|AnimalAnonID), 
-              family = "binomial", data = TsizeMat)
-  summary$analyzed = TRUE
-  # Check p-value of weight effect
-  coef_pval <- summary(mod)$coefficients["MeasureSD", "Pr(>|z|)"]
-  if (is.na(coef_pval) || coef_pval > 0.05) {
-    summary$error= "No signifcant effect of body mass on sexual maturity"
-    return(list(summary = summary, model = mod, p = NULL))
-  }
-  # Estimate weights at 2.5%, 50%, 97.5% maturity    
-  seq_weight = seq(0,max(TsizeMat$MeasureSD), 0.01)
-  preds <- predict(mod, newdata = tibble::tibble(MeasureSD = seq_weight, AnimalAnonID = 1),
-                   re.form = NA, type = "response")
-  summary$Sizeat2.5 <- seq_weight[which.min(abs(preds - 0.025))]
-  summary$Sizeat50 <- seq_weight[which.min(abs(preds - 0.5))]
-  summary$Sizeat97.5 <- seq_weight[which.min(abs(preds - 0.975))]
-  
-  n_bins <- 10
+    n_bins <- 30
 breaks <- seq(
  0,
   quantile(TsizeMat$MeasurementValue, 0.975,na.rm = TRUE),
@@ -239,6 +220,29 @@ bin_dat <- TsizeMat %>%
     prop_mature = mean(maturity),
     .groups = "drop"
   ) 
+
+
+mod = NULL
+  # Fit maturity model -----------------------------------------------------
+  try(mod <- glmer(maturity~MeasureSD + (1|AnimalAnonID), 
+              family = "binomial", data = TsizeMat))
+ if(!is.null(mod)){
+  summary$analyzed = TRUE
+  # Check p-value of weight effect
+  coef_pval <- summary(mod)$coefficients["MeasureSD", "Pr(>|z|)"]
+  if (is.na(coef_pval) || coef_pval > 0.05) {
+    summary$error= "No signifcant effect of body mass on sexual maturity"
+    return(list(summary = summary, model = mod, p = NULL))
+  }
+  # Estimate weights at 2.5%, 50%, 97.5% maturity    
+  seq_weight = seq(0,max(TsizeMat$MeasureSD), 0.01)
+  preds <- predict(mod, newdata = tibble::tibble(MeasureSD = seq_weight, AnimalAnonID = 1),
+                   re.form = NA, type = "response")
+  summary$Sizeat2.5 <- seq_weight[which.min(abs(preds - 0.025))]
+  summary$Sizeat50 <- seq_weight[which.min(abs(preds - 0.5))]
+  summary$Sizeat97.5 <- seq_weight[which.min(abs(preds - 0.975))]
+  
+
 # Relationship between unstandardized and standardized measurement
 pred_dat <- data.frame(
   MeasurementValue = seq(
@@ -303,6 +307,40 @@ pred_dat <- pred_dat %>%
     axis.text = element_text(color = "black"),
     legend.position = "none"
   )
+ }else{
+   p = ggplot() +
+  # Observed percentage points
+  geom_point(
+    data = bin_dat,
+    aes(x = bin_mid, y = prop_mature, size = N),
+    shape = 21,
+    fill = "white",
+    color = "black",
+    stroke = 0.8
+  ) +
+  scale_y_continuous(
+    labels = scales::percent_format(accuracy = 1),
+    limits = c(-0.05, 1.08),
+    breaks = seq(0, 1, 0.25)
+  ) +
+  scale_size_continuous(
+    range = c(2.5, 6),
+    guide = "none"
+  ) +
+
+  labs(
+    x = "Body Mass",
+    y = "Sexual Maturity",
+    ) +
+
+  theme_classic(base_size = 14) +
+  theme(
+      axis.title = element_text(face = "bold"),
+    axis.text = element_text(color = "black"),
+    legend.position = "none"
+  )
+   summary$error="model did not converge"
+ }
   
   return(list(summary = summary, model = mod, p =p))
 }

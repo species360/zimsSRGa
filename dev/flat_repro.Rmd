@@ -216,7 +216,7 @@ if("Season" %in% RepSect){
   if ("season" %in% RepSect) {
     out[["season"]] <- Rep_season(subfert, institution,  MinNBirth = MinNSeas,
                                   Hemisphere  = c("North", "South", "All"))
-    out$summary$sections$season <- out[["season"]]$summary$analyzed
+    out$summary$sections$season <- out[["season"]]$summary$All$analyzed
   }
   
    ### --- 6. Model of age-specific reproductive success
@@ -265,7 +265,7 @@ if("Season" %in% RepSect){
     )
     out$summary$sections$LRS <- out[["LRS"]]$summary$analyzed
     }else{
-      out$summary$sections$LRS <- "no lx or no mx"
+      out$summary$sections$LRS <- FALSE
     }
   }
   
@@ -612,7 +612,7 @@ Rep_littersize <- function(ReproData,
            Probability >= ParentPercSire) %>%
     transmute(FatherAnonID = ParentAnonID,
               AnimalAnonID,
-              Father_Age = round(ParentAge, 2)) %>%
+              Father_Age = round(ParentAge, 1)) %>%
     distinct()
   
   # Filter dams and join sires
@@ -848,7 +848,7 @@ Rep_birthinterval <- function(ReproData, IntervalIn = "year", ParentPerc = 80,
       mutate(prop = N / sum(N))
     
     out_summary <- list(
-      NParents = n_distinct(intervals_df$ParentAnonID),
+      NFemales = n_distinct(intervals_df$ParentAnonID),
       NInterval = nrow(intervals_df),
       MeanInterval = mean(intervals_df$interval_days),
       MedianInterval = median(intervals_df$interval_days),
@@ -1474,7 +1474,11 @@ Rep_pattern <- function(ReproData,
   aic0 <- AIC(mod0)
   AIC_detailed <- add_row(AIC_detailed, Model = "Null", T1 = NA, T2 = NA, 
                           AIC = aic0, k = "1")
-  preds0 <- rep.int(predict(mod0, type = "response"), length(ages))
+  temp=predict(mod0, newdata= tibble(LS = rep(1,length(ages))),type = "link", se.fit = TRUE)
+  preds0 <- tibble(Age = ages,
+                   RS = exp(temp$fit),
+                   lower = exp(temp$fit-1.96*temp$se.fit),
+                   upper = exp(temp$fit+1.96*temp$se.fit))
   
   # One-threshold model
   best1 <- list(aic = Inf)
@@ -1487,11 +1491,15 @@ Rep_pattern <- function(ReproData,
     AIC_detailed <- add_row(AIC_detailed, Model = "1-threshold", 
                             T1 = T1, T2 = NA, AIC = aic_adj, k = "2+1")
     if (aic_adj < best1$aic) {
-      preds <- predict(mod, newdata = data.frame(
+      temp = predict(mod, newdata = data.frame(
         Age = ages,
         a1 = ifelse(ages < T1, ages - T1, 0),
         a2 = ifelse(ages > T1, ages - T1, 0)
-      ), type = "response")
+      ), type = "link", se.fit = TRUE)
+      preds <- tibble(Age = ages,
+                   RS = exp(temp$fit),
+                   lower = exp(temp$fit-1.96*temp$se.fit),
+                   upper = exp(temp$fit+1.96*temp$se.fit))
       best1 <- list(mod = mod, T1 = T1, aic = aic_adj, preds = preds)
     }
   }
@@ -1511,13 +1519,18 @@ Rep_pattern <- function(ReproData,
       AIC_detailed <- add_row(AIC_detailed, Model = "2-threshold",
                               T1 = T1, T2 = T2, AIC = aic_adj, k = "3+2")
       if (aic_adj < best2$aic) {
-        preds <- predict(mod, newdata = data.frame(
-          Age = ages,
+             temp = predict(mod, newdata = data.frame(
+        Age = ages,
+       Age = ages,
           a1 = ifelse(ages < T1, ages - T1, 0),
           a2 = ifelse(ages >= T1 & ages <= T2, ages - T1, 0),
           a3 = ifelse(ages > T2, ages - T2, 0)
-        ), type = "response")
-        best2 <- list(mod = mod, T1 = T1, T2 = T2, aic = aic_adj, preds = preds)
+      ), type = "link", se.fit = TRUE)
+      preds <- tibble(Age = ages,
+                   RS = exp(temp$fit),
+                   lower = exp(temp$fit-1.96*temp$se.fit),
+                   upper = exp(temp$fit+1.96*temp$se.fit))
+           best2 <- list(mod = mod, T1 = T1, T2 = T2, aic = aic_adj, preds = preds)
       }
     }
   }
@@ -1537,12 +1550,70 @@ Rep_pattern <- function(ReproData,
 MaxAgeLS <- ages[which.max(preds)]
   
   summary$analyzed <- TRUE
-  summary$model_type <- model_type
+  summary$model_type <- switch(as.character(model_type),
+                  "0" = "constant",
+                  "1" = "1-treshold",
+                  "2" = "2-tresholds")
   summary$T1 <- if (model_type == 1) best1$T1 else if (model_type == 2) best2$T1 else NA
   summary$T2 <- if (model_type == 2) best2$T2 else NA
   summary$MaxAgeLS <- MaxAgeLS
   
-  return(list(summary = summary, model = final_model, AIC_detailed = AIC_detailed, predictions = preds))
+
+  p = ggplot() +
+
+  # Model confidence ribbon
+  geom_ribbon(
+    data = preds,
+    aes(x = Age, ymin = lower, ymax = upper),
+    fill = "brown",
+    alpha = 0.18
+  ) +
+
+  # Model prediction line
+  geom_line(
+    data =preds,
+    aes(x = Age,  y = RS),
+    color = "brown",
+    linewidth = 1.2
+  ) +
+  # Observed percentage points
+  geom_point(
+    data = datamutate(age = round(Age))%>%
+      group_by(Age)%>%
+      summarise(RS = mean(LS), 
+                lower = quantile(LS,0.05), 
+                upper = quantile(LS,0.95), 
+                N= n()),
+    aes(x = age, y = LS, size = N),
+    shape = 21,
+    fill = "white",
+    color = "black",
+    stroke = 0.8
+  ) +
+  scale_y_continuous(
+    labels = scales::percent_format(accuracy = 1),
+    limits = c(-0.05, 1.08),
+    breaks = seq(0, 1, 0.25)
+  ) +
+  scale_size_continuous(
+    range = c(2.5, 6),
+    guide = "none"
+  ) +
+
+  labs(
+    x = "Age",
+    y = "Fertility",
+    ) +
+
+  theme_classic(base_size = 14) +
+  theme(
+      axis.title = element_text(face = "bold"),
+    axis.text = element_text(color = "black"),
+    legend.position = "none"
+  )
+
+  
+  return(list(summary = summary, model = final_model, AIC_detailed = AIC_detailed, predictions = preds, p = p))
 }
 ```
 
@@ -1676,7 +1747,7 @@ Rep_weight1strepro <- function(AnimalData, parent, GrowthData,
            RecordType == "")
   
   # Remove outliers
-  v = Gro_Rout_quan(z =  GrowthData$MeasurementValue, x =  rep(1, nrow( GrowthData)),  
+  v = Gro_Rout_quan(z =  GrowthData$MeasurementValue, x =  GrowthData$Age,  
                     minq = 0.05, type = "upper")
   GrowthData =  GrowthData[v==1,]
 
@@ -1716,7 +1787,7 @@ filter(AnimalAnonID  %in% AnimalData$AnimalAnonID,
       Firstyear = coalesce(BirthDate, Yearmat),
       maturity = as.integer(as_date(MeasurementDate) >= as_date(Yearmat))
     ) %>%
-    tidyr::drop_na(Firstyear, MeasurementValue)
+    tidyr::drop_na(Firstyear, MeasurementValue, maturity)
   
   summary$Nmeasures <- nrow(TsizeMat)
   summary$NMat <- sum(TsizeMat$maturity == 1, na.rm = TRUE)
@@ -1726,8 +1797,7 @@ filter(AnimalAnonID  %in% AnimalData$AnimalAnonID,
  summary$SDWeight <- sd(TsizeMat$MeasurementValue)
   
   TsizeMat <-  TsizeMat %>%
-    mutate(MeasureSD = (MeasurementValue -summary$MeanWeight)/ summary$SDWeight )%>%
-    tidyr::drop_na(maturity)
+    mutate(MeasureSD = (MeasurementValue -summary$MeanWeight)/ summary$SDWeight )
  
   # --- Check thresholds
   if (summary$Nmeasures < MinNMeasures) {
@@ -1747,25 +1817,7 @@ filter(AnimalAnonID  %in% AnimalData$AnimalAnonID,
     return(list(summary = summary))
   }
   
-  # Fit maturity model -----------------------------------------------------
-  mod = glmer(maturity~MeasureSD + (1|AnimalAnonID), 
-              family = "binomial", data = TsizeMat)
-  summary$analyzed = TRUE
-  # Check p-value of weight effect
-  coef_pval <- summary(mod)$coefficients["MeasureSD", "Pr(>|z|)"]
-  if (is.na(coef_pval) || coef_pval > 0.05) {
-    summary$error= "No signifcant effect of body mass on sexual maturity"
-    return(list(summary = summary, model = mod, p = NULL))
-  }
-  # Estimate weights at 2.5%, 50%, 97.5% maturity    
-  seq_weight = seq(0,max(TsizeMat$MeasureSD), 0.01)
-  preds <- predict(mod, newdata = tibble::tibble(MeasureSD = seq_weight, AnimalAnonID = 1),
-                   re.form = NA, type = "response")
-  summary$Sizeat2.5 <- seq_weight[which.min(abs(preds - 0.025))]
-  summary$Sizeat50 <- seq_weight[which.min(abs(preds - 0.5))]
-  summary$Sizeat97.5 <- seq_weight[which.min(abs(preds - 0.975))]
-  
-  n_bins <- 10
+    n_bins <- 30
 breaks <- seq(
  0,
   quantile(TsizeMat$MeasurementValue, 0.975,na.rm = TRUE),
@@ -1785,6 +1837,29 @@ bin_dat <- TsizeMat %>%
     prop_mature = mean(maturity),
     .groups = "drop"
   ) 
+
+
+mod = NULL
+  # Fit maturity model -----------------------------------------------------
+  try(mod <- glmer(maturity~MeasureSD + (1|AnimalAnonID), 
+              family = "binomial", data = TsizeMat))
+ if(!is.null(mod)){
+  summary$analyzed = TRUE
+  # Check p-value of weight effect
+  coef_pval <- summary(mod)$coefficients["MeasureSD", "Pr(>|z|)"]
+  if (is.na(coef_pval) || coef_pval > 0.05) {
+    summary$error= "No signifcant effect of body mass on sexual maturity"
+    return(list(summary = summary, model = mod, p = NULL))
+  }
+  # Estimate weights at 2.5%, 50%, 97.5% maturity    
+  seq_weight = seq(0,max(TsizeMat$MeasureSD), 0.01)
+  preds <- predict(mod, newdata = tibble::tibble(MeasureSD = seq_weight, AnimalAnonID = 1),
+                   re.form = NA, type = "response")
+  summary$Sizeat2.5 <- seq_weight[which.min(abs(preds - 0.025))]
+  summary$Sizeat50 <- seq_weight[which.min(abs(preds - 0.5))]
+  summary$Sizeat97.5 <- seq_weight[which.min(abs(preds - 0.975))]
+  
+
 # Relationship between unstandardized and standardized measurement
 pred_dat <- data.frame(
   MeasurementValue = seq(
@@ -1849,6 +1924,40 @@ pred_dat <- pred_dat %>%
     axis.text = element_text(color = "black"),
     legend.position = "none"
   )
+ }else{
+   p = ggplot() +
+  # Observed percentage points
+  geom_point(
+    data = bin_dat,
+    aes(x = bin_mid, y = prop_mature, size = N),
+    shape = 21,
+    fill = "white",
+    color = "black",
+    stroke = 0.8
+  ) +
+  scale_y_continuous(
+    labels = scales::percent_format(accuracy = 1),
+    limits = c(-0.05, 1.08),
+    breaks = seq(0, 1, 0.25)
+  ) +
+  scale_size_continuous(
+    range = c(2.5, 6),
+    guide = "none"
+  ) +
+
+  labs(
+    x = "Body Mass",
+    y = "Sexual Maturity",
+    ) +
+
+  theme_classic(base_size = 14) +
+  theme(
+      axis.title = element_text(face = "bold"),
+    axis.text = element_text(color = "black"),
+    legend.position = "none"
+  )
+   summary$error="model did not converge"
+ }
   
   return(list(summary = summary, model = mod, p =p))
 }

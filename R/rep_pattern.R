@@ -176,7 +176,7 @@ Rep_pattern <- function(ReproData,
 MaxAgeLS <- ages[which.max(preds)]
   
   summary$analyzed <- TRUE
-  summary$model_type <- model_type
+  summary$model_type <- final_model 
   summary$T1 <- if (model_type == 1) best1$T1 else if (model_type == 2) best2$T1 else NA
   summary$T2 <- if (model_type == 2) best2$T2 else NA
   summary$MaxAgeLS <- MaxAgeLS

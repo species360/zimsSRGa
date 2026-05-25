@@ -107,7 +107,7 @@ Rep_birthinterval <- function(ReproData, IntervalIn = "year", ParentPerc = 80,
       mutate(prop = N / sum(N))
     
     out_summary <- list(
-      NParents = n_distinct(intervals_df$ParentAnonID),
+      NFemales = n_distinct(intervals_df$ParentAnonID),
       NInterval = nrow(intervals_df),
       MeanInterval = mean(intervals_df$interval_days),
       MedianInterval = median(intervals_df$interval_days),

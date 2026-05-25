@@ -1,6 +1,7 @@
 # Data paper Survival
 
 ``` r
+
 library(zimsSRGa)
 library(zims4science)
 library(tidyverse)
@@ -12,6 +13,7 @@ library(glue)
 ### Filters
 
 ``` r
+
 # List of taxa to analyze -------------------------------------------------------
 TaxaList <- c("Mammalia", "Aves", "Reptilia", "Amphibia", 
               "Chondrichthyes", "Osteichthyes")
@@ -68,6 +70,7 @@ MaxLE = 2     #Maximum remaining life expectancy at max age
 ## Analyses from birth
 
 ``` r
+
 #Data
 # SpeciesList = List of species with enough data
 # ExtractDate = "2024-08-29" Date of Zims data extraction date
@@ -163,6 +166,7 @@ save("repout", file = glue::glue("{AnalysisDir}/Rdata/{Taxa}_{speciesname}.RData
 ## Analyses from age at sexual maturity
 
 ``` r
+
 #Data
 # SpeciesList = List of species with enough data
 # Dat_species = Age at first reproduction per sex and species
@@ -264,6 +268,7 @@ save("repout", file = glue::glue("{AnalysisDir}/RdataAM/{Taxa}_{speciesname}.RDa
 ### Create simulated datasets
 
 ``` r
+
 #Data
 # Tabspecies = Table of Species, number of individuals and result category
 
@@ -387,6 +392,7 @@ for (t in unique(Tabspesim$Class)){
 ### Run analysis
 
 ``` r
+
 Species_List=list()
 
 

@@ -31,6 +31,7 @@ A data frame with columns:
 ## Examples
 
 ``` r
+
 entryAge = sample(c(1:10), 200, replace = TRUE)
 data <- data.frame(
   entryAge = entryAge,

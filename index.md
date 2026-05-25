@@ -10,6 +10,7 @@ You can install the development version of zimsSRGa from
 [GitHub](https://github.com/) with:
 
 ``` r
+
 # install.packages("pak")
 pak::pak("species360/zimsSRGa")
 ```
@@ -21,6 +22,7 @@ Full documentation website on: <https://species360.github.io/zimsSRGa>
 # Tutorial for survival
 
 ``` r
+
 library(zimsSRGa)
 
 #Filters -----------------------------------------------------------------------

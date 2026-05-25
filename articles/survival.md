@@ -1,6 +1,7 @@
 # Survival
 
 ``` r
+
 library(zimsSRGa)
 ```
 
@@ -32,6 +33,7 @@ different models \* the remaining life expectancy per age \* key
 survival metrics \* Statistics to check the fit of the selected model
 
 ``` r
+
 data(toy_core)
 data(toy_deathinformation)
 out <- Sur_main(toy_core, DeathInformation = toy_deathinformation, BirthType_sel = "All",
@@ -40,18 +42,18 @@ out <- Sur_main(toy_core, DeathInformation = toy_deathinformation, BirthType_sel
 #> [1] "GO"
 #> 
 #> Running sequence to find jump SDs... Done
-#> Total jump SDs computing time: 10.43 secs.
+#> Total jump SDs computing time: 10.57 secs.
 #> 
 #> Multiple simulations started...
 #> 
-#> R Version:  R version 4.5.3 (2026-03-11)
+#> R Version:  R version 4.6.0 (2026-04-24)
 #> snowfall 1.84-6.3 initialized (using snow 0.4-4): parallel execution on 3 CPUs.
 #> Library BaSTA loaded.
 #> Library BaSTA loaded in cluster.
 #> 
 #> Stopping cluster
 #> Simulations finished.
-#> Total MCMC computing time: 6.53 secs.
+#> Total MCMC computing time: 4.12 secs.
 #> 
 #> Calculating summary statistics... Done.
 #> All parameters converged properly.
@@ -98,6 +100,7 @@ the best model \* the DIC table comparing the different fit of the
 Models
 
 ``` r
+
 data(toy_core)
 data(toy_deathinformation)
 out <- Sur_ana(toy_core,  DeathInformation = toy_deathinformation, Models = "GO", Shape = "simple",
@@ -105,7 +108,7 @@ out <- Sur_ana(toy_core,  DeathInformation = toy_deathinformation, Models = "GO"
 #> [1] "GO"
 #> 
 #> Running sequence to find jump SDs... Done
-#> Total jump SDs computing time: 10.30 secs.
+#> Total jump SDs computing time: 10.05 secs.
 #> 
 #> Multiple simulations started...
 #> snowfall 1.84-6.3 initialized (using snow 0.4-4): parallel execution on 3 CPUs.
@@ -114,7 +117,7 @@ out <- Sur_ana(toy_core,  DeathInformation = toy_deathinformation, Models = "GO"
 #> 
 #> Stopping cluster
 #> Simulations finished.
-#> Total MCMC computing time: 6.32 secs.
+#> Total MCMC computing time: 4.04 secs.
 #> 
 #> Calculating summary statistics... Done.
 #> All parameters converged properly.
@@ -139,6 +142,7 @@ expectancy per age (relex_from0) \* the probability to live 5 years more
 (Sur5) \* Age-specific survival (Sur1) \* The monthly survival (Sur1m)
 
 ``` r
+
 data(toy_core)
 data(toy_deathinformation)
 out <- Sur_ana(toy_core,  DeathInformation = toy_deathinformation, 
@@ -147,7 +151,7 @@ out <- Sur_ana(toy_core,  DeathInformation = toy_deathinformation,
 #> [1] "GO"
 #> 
 #> Running sequence to find jump SDs... Done
-#> Total jump SDs computing time: 10.46 secs.
+#> Total jump SDs computing time: 10.18 secs.
 #> 
 #> Multiple simulations started...
 #> snowfall 1.84-6.3 initialized (using snow 0.4-4): parallel execution on 3 CPUs.
@@ -156,7 +160,7 @@ out <- Sur_ana(toy_core,  DeathInformation = toy_deathinformation,
 #> 
 #> Stopping cluster
 #> Simulations finished.
-#> Total MCMC computing time: 6.52 secs.
+#> Total MCMC computing time: 4.02 secs.
 #> 
 #> Calculating summary statistics... Done.
 #> All parameters converged properly.
@@ -196,6 +200,7 @@ date later than LatestDate \* Depart dates later than LatestDate are
 changed to latest date. These individuals are considered right-censored.
 
 ``` r
+
 data(toy_core)
 data(toy_deathinformation)
 out<- surv_Bastab(toy_core, DeathInformation = toy_deathinformation,
@@ -208,6 +213,7 @@ out<- surv_Bastab(toy_core, DeathInformation = toy_deathinformation,
 This function estimated the Kaplan-Meier table
 
 ``` r
+
 entryAge = sample(c(1:10), 200, replace = TRUE)
 data <- data.frame(
   entryAge = entryAge,
@@ -228,6 +234,7 @@ expectancy over ages. It includes the following arguments:
 - `xv` Age vector
 
 ``` r
+
 Lx = matrix(c(seq(1,0,by = -0.1), 1,seq(0.5,0,length.out = 10)),nrow =2)
 out <- Sur_relex(Lx, dx = 1, xv = c(0:10))
 ```
@@ -242,6 +249,7 @@ It includes the following arguments:
 - `Nyear` Number of year to survive. Default = 1
 
 ``` r
+
 Lx = matrix(c(seq(1,0,by = -0.1), 1,seq(0.5,0,length.out = 10)),nrow =2)
 out <- Sur_age(Lx, Nyear = 5, xv = c(0:10))
 ```
@@ -256,6 +264,7 @@ the population is still alive. It includes the following arguments:
 - `xx` Proportion of the population still alive
 
 ``` r
+
 Lx = matrix(c(seq(1,0,by = -0.1), 1,seq(0.5,0,length.out = 10)),nrow =2)
 out <- Sur_xx(Lx,  xv = c(0:10), xx = 0.1)
 ```
@@ -284,6 +293,7 @@ arguments:
 - `Lx`: Values of Lx for which age is requested
 
 ``` r
+
 KM_tab = data.frame( Ages = 1:10,
                      ple = sort(runif(10, 0, 1), decreasing = TRUE))
 out <- KM_age(KM_tab, Lx = c(0.5,0.1))
@@ -299,6 +309,7 @@ Kaplan-Meier table. It includes the following arguments:
 - `Age`: Age for which Lx is requested
 
 ``` r
+
 KM_tab = data.frame( Ages = 1:10,
                      ple = sort(runif(10, 0, 1), decreasing = TRUE))
 out <- KM_Lx(KM_tab, Age = c(3,6.5))
@@ -325,6 +336,7 @@ of longevity. It plots the distribution of longevity with gaps if
 `PlotDir` is given.
 
 ``` r
+
 TempDir <- paste0(tempdir(check = TRUE),'/temp')
 dir.create(TempDir)
 data(toy_core) #### CHANGE DATASET WITH ONE EXCLUDING ABOVE95 99 99.9
@@ -351,6 +363,7 @@ It returns a data frame where each line is a gap described by its
 initial/starting age, its final/ending age and its length
 
 ``` r
+
 x = runif(10,0,40)
 out<-find_gaps(x,MaxAlive = 5, plot = FALSE)
 ```

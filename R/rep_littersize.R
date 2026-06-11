@@ -76,7 +76,7 @@ Rep_littersize <- function(ReproData,
            Probability >= ParentPercSire) %>%
     transmute(FatherAnonID = ParentAnonID,
               AnimalAnonID,
-              Father_Age = round(ParentAge, 1)) %>%
+              Father_Age = round(ParentAge)) %>%
     distinct()
   
   # Filter dams and join sires
@@ -109,13 +109,14 @@ Rep_littersize <- function(ReproData,
         df
       })) %>%
       tidyr::unnest(cols = c(data)) %>%
-      group_by(ParentAnonID, Offspring_Inst, litter, Mother_Age) %>%
+      group_by(ParentAnonID, Offspring_Inst, litter) %>%
       summarise(
         litterSize = n_distinct(AnimalAnonID),
         MeanBirthDate = median(Offspring_BirthDate),
         OffspringAnonID = list(unique(AnimalAnonID)),
         FatherAnonID = list(unique(FatherAnonID)),
         Father_Age = list(unique(Father_Age)),
+        Mother_Age = mean(Mother_Age),
         .groups = "drop"
       ) %>%
       rename(MotherAnonID = ParentAnonID,
@@ -125,12 +126,13 @@ Rep_littersize <- function(ReproData,
     littSizeDf <- nested %>%
       tidyr::unnest(cols = c(FatherAnonID, Father_Age)) %>%
       distinct() %>%
-      group_by(MotherAnonID, InstitutionAnonID, litterSize, MeanBirthDate, Mother_Age) %>%
+      group_by(MotherAnonID, InstitutionAnonID, litterSize, MeanBirthDate) %>%
       summarise(
         OffspringAnonID = list(unique(OffspringAnonID)),
         FatherAnonID = list(unique(FatherAnonID)),
         Father_Age = list(unique(Father_Age)),
-        .groups = "drop"
+           Mother_Age = mean(Mother_Age),
+     .groups = "drop"
       )
     
     # Compute summaries

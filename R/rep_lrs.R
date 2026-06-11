@@ -82,7 +82,8 @@ Rep_LRS <- function(ReproData, AnimalData, lx = NULL, mx = NULL, ParentPerc = 80
   # Check sample size
   if (nrow(reproLRS) < MinN) {
     return(list(
-      summary = list(analyzed = FALSE, error = glue::glue("Too few individuals with LRS data (n = {nrow(reproLRS)} < {MinN})"),
+      summary = list(analyzed = FALSE, 
+                     error = glue::glue("Too few individuals with LRS data (n = {nrow(reproLRS)} < {MinN})"),
     N_LRS = nrow(reproLRS),
     Mean_LRS = NA,
     Median_LRS = NA,

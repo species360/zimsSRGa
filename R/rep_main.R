@@ -252,6 +252,7 @@ if("Season" %in% RepSect){
     out$summary$sections$LRS <- out[["LRS"]]$summary$analyzed
     }else{
       out$summary$sections$LRS <- FALSE
+      out[["LRS"]]$summary$erros = "no lx or mx"
     }
   }
   
